@@ -6,9 +6,10 @@ export const canvasHeight = 900;
 export const zoomThreshold = 5;
 export const STUCK_DELAY = 5000;
 export const winnerAreaHeight = 168;
-export const YEONSEO_HAIR = '#dccaf0';
-export const YEONSEO_PINK = '#f6c7d6';
-export const YEONSEO_NEON = '#d0b8ec';
+// 로즈 모브 패널의 밝은 테두리색을 경기장 네온과 미니맵에도 공통 적용한다.
+export const YEONSEO_HAIR = '#f0c9db';
+export const YEONSEO_PINK = '#f6ddeb';
+export const YEONSEO_NEON = '#f0c9db';
 export const YEONSEO_BORDER = YEONSEO_HAIR;
 export const YEONSEO_NEON_FILL = YEONSEO_NEON;
 export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_NEON;
