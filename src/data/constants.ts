@@ -6,14 +6,15 @@ export const canvasHeight = 900;
 export const zoomThreshold = 5;
 export const STUCK_DELAY = 5000;
 export const winnerAreaHeight = 168;
-export const YEONSEO_PINK = '#ff99cc';
-export const YEONSEO_NEON = '#ff66cc';
-export const YEONSEO_BORDER = YEONSEO_PINK;
-export const YEONSEO_NEON_FILL = YEONSEO_PINK;
-export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_PINK;
+export const YEONSEO_HAIR = '#e7d8f2';
+export const YEONSEO_PINK = '#fcd0dc';
+export const YEONSEO_NEON = YEONSEO_HAIR;
+export const YEONSEO_BORDER = YEONSEO_HAIR;
+export const YEONSEO_NEON_FILL = YEONSEO_HAIR;
+export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_HAIR;
 export const YEONSEO_BORDER_COLORS = [
-  YEONSEO_PINK,
-  YEONSEO_PINK,
+  YEONSEO_HAIR,
+  YEONSEO_HAIR,
 ] as const;
 export const UI_FONT_FAMILY = `'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif`;
 
@@ -24,8 +25,8 @@ export enum Skills {
 
 export const DefaultEntityColor = {
   box: YEONSEO_NEON_FILL,
-  circle: YEONSEO_PINK,
-  polyline: YEONSEO_PINK,
+  circle: YEONSEO_HAIR,
+  polyline: YEONSEO_HAIR,
 } as const;
 
 export const DefaultBloomColor = {
@@ -49,8 +50,8 @@ export const Themes: Record<string, ColorTheme> = {
         bloomRadius: 0,
       },
       circle: {
-        fill: YEONSEO_PINK,
-        outline: YEONSEO_PINK,
+        fill: YEONSEO_HAIR,
+        outline: YEONSEO_HAIR,
         bloom: YEONSEO_NEON,
         bloomRadius: 0,
       },
@@ -83,8 +84,8 @@ export const Themes: Record<string, ColorTheme> = {
         bloomRadius: 15,
       },
       circle: {
-        fill: YEONSEO_PINK,
-        outline: YEONSEO_PINK,
+        fill: YEONSEO_HAIR,
+        outline: YEONSEO_HAIR,
         bloom: YEONSEO_NEON,
         bloomRadius: 15,
       },
