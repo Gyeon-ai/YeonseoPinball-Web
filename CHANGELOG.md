@@ -1,6 +1,10 @@
 # Changelog
 
 - 2026-09-24:
+    - Replaced the silver-lavender settings and timer panels with the brighter rose-mauve palette selected for the final Yeonseo theme.
+    - Matched the playfield neon, minimap border and entities, camera viewport indicator, skill effect, and cooldown indicator to the rose-mauve palette.
+
+- 2026-09-24:
     - Reduced panel opacity to reveal the playfield like the Tayo UI while keeping the brighter Yeonseo silver-lavender source color.
     - Replaced the remaining dark settings and timer buttons with bright lavender controls and dark readable text.
     - Separated the solid lavender border from the translucent fill so the border layer no longer makes the panel body opaque.
