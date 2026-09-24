@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>연서 핀볼</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/yeonseo-pinball-icon-192.png?v=yeonseo-sd-v3">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/yeonseo-pinball-icon-192.png?v=yeonseo-sd-v3">
+  <link rel="manifest" href="assets/manifest.json?v=yeonseo-sd-v3">
+
+  <meta name="msapplication-TileColor" content="#3a294f">
+  <meta name="msapplication-TileImage" content="assets/yeonseo-pinball-icon-512.png">
+  <meta name="theme-color" content="#000000">
+
+  <meta name="description" content="유연서 구독 퍼스나콘 공을 굴려 당첨자를 뽑는 연서 핀볼 추첨기">
+  <meta property="og:title" content="연서 핀볼">
+  <meta property="og:description" content="연근단 퍼스나콘 공으로 당첨자를 뽑는 연서 핀볼 추첨기">
+  <meta property="og:site_name" content="연서 핀볼">
+  <meta property="og:type" content="website">
+
+  <link rel='stylesheet' href='assets/style.scss' />
+</head>
+<body>
+<script type="module" src="./src/index.ts"></script>
+<script type="text/javascript">
+  const DEFAULT_PINBALL_NAMES = '유연서,연근단,핀볼';
+
+  function getNames() {
+    const value = document.querySelector('#in_names').value.trim();
+    return value.split(/[,\r\n]/g).map(v => v.trim()).filter(v => !!v);
+  }
+
+  function parseName(nameStr) {
+    const weightRegex = /(\/\d+)/;
+    const countRegex = /(\*\d+)/;
+    const hasWeight = weightRegex.test(nameStr);
+    const hasCount = countRegex.test(nameStr);
+    const name = /^\s*([^\/*]+)?/.exec(nameStr)[1];
+    const weight = hasWeight ? parseInt(weightRegex.exec(nameStr)[1].replace('/', '')) : 1;
+    const count = hasCount ? parseInt(countRegex.exec(nameStr)[1].replace('*', '')) : 1;
+    return {
+      name,
+      weight,
+      count,
+    };
+  }
+
+  function getReady() {
+    resetResultTimer();
+    const names = getNames();
+    window.roulette.setMarbles(names);
+    ready = names.length > 0;
+    localStorage.setItem('yeonseo_pinball_names', names.join(','));
+    switch (winnerType) {
+      case 'first':
+        setWinnerRank(1);
+        break;
+      case 'last':
+        const total = window.roulette.getCount();
+        setWinnerRank(total);
+        break;
+    }
+  }
+
+  function setWinnerRank(rank) {
+    document.querySelector('#in_winningRank').value = rank;
+    window.options.winningRank = rank - 1;
+    window.roulette.setWinningRank(window.options.winningRank);
+
+    if (winnerType === 'first') {
+      document.querySelector('.btn-first-winner').classList.toggle('active', true);
+      document.querySelector('.btn-last-winner').classList.toggle('active', false);
+      document.querySelector('#in_winningRank').classList.toggle('active', false);
+    } else if (winnerType === 'last') {
+      document.querySelector('.btn-first-winner').classList.toggle('active', false);
+      document.querySelector('.btn-last-winner').classList.toggle('active', true);
+      document.querySelector('#in_winningRank').classList.toggle('active', false);
+    } else if (winnerType === 'custom') {
+      document.querySelector('.btn-first-winner').classList.toggle('active', false);
+      document.querySelector('.btn-last-winner').classList.toggle('active', false);
+      document.querySelector('#in_winningRank').classList.toggle('active', true);
+    }
+  }
+
+  function setSpeed(speed) {
+    window.roulette.setSpeed(speed);
+    document.querySelectorAll('.btn-speed').forEach((button) => {
+      button.classList.toggle('active', Number(button.dataset.speed) === speed);
+    });
+  }
+
+  let countdownInterval = null;
+  let countdownEndAt = 0;
+  let countdownRemainingMs = 0;
+  let countdownPaused = false;
+
+  function formatCountdown(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.ceil(totalSeconds));
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const seconds = safeSeconds % 60;
+    const minuteText = minutes.toString().padStart(2, '0');
+    const secondText = seconds.toString().padStart(2, '0');
+    return hours > 0 ? `${hours.toString().padStart(2, '0')}:${minuteText}:${secondText}` : `${minuteText}:${secondText}`;
+  }
+
+  function clearCountdownInterval() {
+    if (countdownInterval !== null) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+    }
+  }
+
+  function updateCountdownPauseButton() {
+    const button = document.querySelector('#btnResultTimerPause');
+    if (!button) return;
+    button.textContent = countdownPaused ? '계속' : '일시정지';
+    button.setAttribute('aria-pressed', countdownPaused ? 'true' : 'false');
+    button.disabled = countdownRemainingMs <= 0;
+  }
+
+  function clearCountdownState() {
+    clearCountdownInterval();
+    countdownEndAt = 0;
+    countdownRemainingMs = 0;
+    countdownPaused = false;
+    updateCountdownPauseButton();
+  }
+
+  function resetResultTimer() {
+    clearCountdownState();
+    const overlay = document.querySelector('#resultTimerOverlay');
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    overlay.classList.remove('running');
+  }
+
+  function showResultTimerSetup() {
+    clearCountdownState();
+    const overlay = document.querySelector('#resultTimerOverlay');
+    overlay.classList.remove('hidden', 'running');
+    document.querySelector('#in_resultTimerMinutes').focus();
+  }
+
+  function updateResultCountdown() {
+    if (!countdownPaused) {
+      countdownRemainingMs = Math.max(0, countdownEndAt - Date.now());
+    }
+
+    document.querySelector('#resultTimerDisplay').textContent = formatCountdown(countdownRemainingMs / 1000);
+    if (countdownRemainingMs === 0) {
+      clearCountdownInterval();
+      updateCountdownPauseButton();
+    }
+  }
+
+  function runResultCountdown() {
+    clearCountdownInterval();
+    countdownEndAt = Date.now() + countdownRemainingMs;
+    updateResultCountdown();
+    countdownInterval = setInterval(updateResultCountdown, 200);
+  }
+
+  function startResultCountdown() {
+    const minutesInput = document.querySelector('#in_resultTimerMinutes');
+    const secondsInput = document.querySelector('#in_resultTimerSeconds');
+    const minutes = Math.max(0, Math.floor(Number(minutesInput.value) || 0));
+    const seconds = Math.min(59, Math.max(0, Math.floor(Number(secondsInput.value) || 0)));
+    const durationSeconds = minutes * 60 + seconds;
+    if (durationSeconds <= 0) return;
+
+    minutesInput.value = minutes;
+    secondsInput.value = seconds;
+    const overlay = document.querySelector('#resultTimerOverlay');
+    countdownRemainingMs = durationSeconds * 1000;
+    countdownPaused = false;
+    overlay.classList.add('running');
+    updateCountdownPauseButton();
+    runResultCountdown();
+  }
+
+  function toggleResultCountdownPause() {
+    if (countdownRemainingMs <= 0) return;
+
+    if (countdownPaused) {
+      countdownPaused = false;
+      updateCountdownPauseButton();
+      runResultCountdown();
+      return;
+    }
+
+    countdownRemainingMs = Math.max(0, countdownEndAt - Date.now());
+    countdownPaused = true;
+    clearCountdownInterval();
+    updateResultCountdown();
+    updateCountdownPauseButton();
+  }
+
+
+  let ready = false;
+  let winnerType = 'first';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initialize();
+  });
+
+  function initialize() {
+    if (!window.roulette || !window.roulette.isReady) {
+      setTimeout(initialize, 100);
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const namesFromUrl = urlParams.get('names');
+
+    if (namesFromUrl) {
+      document.querySelector('#in_names').value = namesFromUrl.replace(/,/g, '\n');
+    } else {
+      const savedNames = localStorage.getItem('yeonseo_pinball_names');
+      if (savedNames) {
+        document.querySelector('#in_names').value = savedNames;
+      } else {
+        document.querySelector('#in_names').value = DEFAULT_PINBALL_NAMES;
+      }
+    }
+    document.querySelector('#in_names').addEventListener('input', () => {
+      getReady();
+    });
+
+    document.querySelector('#in_names').addEventListener('blur', () => {
+      const nameSource = getNames();
+      const nameSet = new Set();
+      const nameCounts = {};
+      nameSource.forEach(nameSrc => {
+        const name = parseName(nameSrc);
+        const key = name.weight > 1 ? `${name.name}/${name.weight}` : name.name;
+        if (!nameSet.has(key)) {
+          nameSet.add(key);
+          nameCounts[key] = 0;
+        }
+        nameCounts[key] += name.count;
+      });
+      const result = [];
+      Object.keys(nameCounts).forEach(key => {
+        if (nameCounts[key] > 1) {
+          result.push(`${key}*${nameCounts[key]}`);
+        } else {
+          result.push(key);
+        }
+      });
+
+      const oldValue = document.querySelector('#in_names').value;
+      const newValue = result.join(',');
+
+      if (oldValue !== newValue) {
+        document.querySelector('#in_names').value = newValue;
+        getReady();
+      }
+    });
+
+    document.querySelector('#btnShuffle').addEventListener('click', () => {
+      getReady();
+    });
+
+    document.querySelector('#btnStart').addEventListener('click', () => {
+      if (!ready) return;
+      resetResultTimer();
+      document.querySelector('#settings').classList.add('game-running');
+      window.roulette.start();
+    });
+
+    document.querySelectorAll('.btn-speed').forEach((button) => {
+      button.addEventListener('click', () => setSpeed(Number(button.dataset.speed)));
+    });
+    setSpeed(1);
+
+    document.querySelector('#btnResultTimerStart').addEventListener('click', startResultCountdown);
+    document.querySelector('#btnResultTimerPause').addEventListener('click', toggleResultCountdownPause);
+    document.querySelector('#btnResultTimerReset').addEventListener('click', showResultTimerSetup);
+
+    window.roulette.setTheme('dark');
+    document.documentElement.classList.remove('light');
+
+    document.querySelector('#in_winningRank').addEventListener('change', (e) => {
+      const v = parseInt(e.target.value, 10);
+      winnerType = 'custom';
+      setWinnerRank(isNaN(v) ? 0 : v);
+    });
+
+    document.querySelector('.btn-last-winner').addEventListener('click', () => {
+      const total = window.roulette.getCount();
+      winnerType = 'last';
+      setWinnerRank(total);
+    });
+    document.querySelector('.btn-first-winner').addEventListener('click', () => {
+      winnerType = 'first';
+      setWinnerRank(1);
+    });
+
+    window.roulette.addEventListener('goal', () => {
+      ready = false;
+      showResultTimerSetup();
+      setTimeout(() => {
+        document.querySelector('#settings').classList.remove('game-running');
+      }, 3000);
+    });
+
+    window.roulette.addEventListener('message', (e) => {
+      simpleToast(e.detail);
+    });
+
+    const toggleBtn = document.querySelector('#btnToggleSettings');
+    const collapsible = document.querySelector('.collapsible-rows');
+    toggleBtn.addEventListener('click', () => {
+      collapsible.classList.toggle('collapsed');
+      toggleBtn.querySelector('.toggle-arrow').textContent =
+        collapsible.classList.contains('collapsed') ? '▲' : '▼';
+    });
+
+    document.querySelector('#btnShuffle').click();
+
+    const maps = window.roulette.getMaps();
+    const mapSelector = document.querySelector('#sltMap');
+    maps.forEach((map) => {
+      const option = document.createElement('option');
+      option.value = map.index;
+      option.innerHTML = map.title;
+      option.setAttribute('data-trans', '');
+      window.translateElement(option);
+      mapSelector.append(option);
+    });
+    mapSelector.addEventListener('change', (e) => {
+      const index = e.target.value;
+      window.roulette.setMap(index);
+    });
+
+    function simpleToast(msg) {
+      const toast = document.createElement('div');
+      toast.classList.add('toast');
+      toast.innerHTML = msg;
+
+      if (window.translateElement) {
+        window.translateElement(toast);
+      }
+
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 1200);
+    }
+
+  }
+</script>
+<h1 class="sr-only">연서 핀볼 - 랜덤 추첨기</h1>
+<header class="brand-mark" aria-label="연서 핀볼">
+  <img src="assets/yeonseo-pinball-icon-192.png?v=yeonseo-sd-v3" alt="" width="76" height="76">
+  <strong>연서 핀볼</strong>
+</header>
+<div id="settings" class="settings">
+  <div class="right">
+    <button id="btnToggleSettings" class="btn-toggle-settings">
+      <span>설정</span>
+      <i class="toggle-arrow">▲</i>
+    </button>
+    <div class="collapsible-rows collapsed">
+      <div class="row">
+        <select id="sltMap" aria-label="맵"></select>
+      </div>
+      <div class="row">
+        <div class="btn-group" aria-label="당첨 순위">
+          <button class="btn-winner btn-first-winner active" data-trans>First</button>
+          <button class="btn-winner btn-last-winner" data-trans>Last</button>
+          <input type="number" id="in_winningRank" value="1" min="1" />
+        </div>
+      </div>
+      <div class="actions setup-actions">
+        <button id="btnShuffle">
+          <i class="icon shuffle"></i>
+          <span data-trans>Shuffle</span>
+        </button>
+        <button id="btnStart">
+          <i class="icon play"></i>
+          <span data-trans>Start</span>
+        </button>
+      </div>
+      <div class="row speed-row">
+        <div class="btn-group speed-group" aria-label="배속">
+          <button type="button" class="btn-speed active" data-speed="1">1x</button>
+          <button type="button" class="btn-speed" data-speed="2">2x</button>
+          <button type="button" class="btn-speed" data-speed="5">5x</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="left">
+    <textarea id="in_names" placeholder="Input names separated by commas or line feed here" data-trans="placeholder">유연서,연근단,핀볼</textarea>
+  </div>
+</div>
+<div id="resultTimerOverlay" class="result-timer-overlay hidden" role="dialog" aria-label="타이머 설정">
+  <div class="result-timer-setup">
+    <strong>타이머 설정</strong>
+    <div class="result-timer-controls">
+      <input type="number" id="in_resultTimerMinutes" value="0" min="0" max="999" step="1" aria-label="타이머 분" />
+      <span>분</span>
+      <input type="number" id="in_resultTimerSeconds" value="0" min="0" max="59" step="1" aria-label="타이머 초" />
+      <span>초</span>
+      <button type="button" id="btnResultTimerStart">시작</button>
+    </div>
+  </div>
+  <div class="result-timer-running" aria-live="polite">
+    <span>남은 시간</span>
+    <strong id="resultTimerDisplay">00:00</strong>
+    <div class="result-timer-actions">
+      <button type="button" id="btnResultTimerPause" aria-pressed="false">일시정지</button>
+      <button type="button" id="btnResultTimerReset">리셋</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

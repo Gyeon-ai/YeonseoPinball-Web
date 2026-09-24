@@ -1,0 +1,25 @@
+{
+  "name": "yeonseo-pinball-web",
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.4",
+    "@parcel/config-default": "^2.16.4",
+    "@parcel/packager-raw-url": "^2.16.4",
+    "@parcel/transformer-sass": "^2.16.4",
+    "@parcel/transformer-webmanifest": "^2.16.4",
+    "parcel": "^2.16.4",
+    "typescript": "^5.6.3"
+  },
+  "scripts": {
+    "lint": "biome check --fix src/",
+    "dev": "parcel index.html --port 1235",
+    "build": "node scripts/clean-dist.js && parcel build index.html --public-url ./ --no-cache && node scripts/fix-manifest-paths.mjs && node scripts/build-sw.js && node scripts/copy-legal.mjs",
+    "preview": "parcel serve dist/index.html --port 4173"
+  },
+  "dependencies": {
+    "box2d-wasm": "^7.0.0"
+  }
+}
