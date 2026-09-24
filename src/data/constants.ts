@@ -80,7 +80,7 @@ export const Themes: Record<string, ColorTheme> = {
         fill: YEONSEO_NEON_FILL,
         outline: YEONSEO_NEON_HIGHLIGHT,
         bloom: YEONSEO_NEON,
-        bloomRadius: 12,
+        bloomRadius: 15,
       },
       circle: {
         fill: YEONSEO_PURPLE,
@@ -92,7 +92,7 @@ export const Themes: Record<string, ColorTheme> = {
         fill: YEONSEO_NEON_HIGHLIGHT,
         outline: YEONSEO_NEON_HIGHLIGHT,
         bloom: YEONSEO_NEON,
-        bloomRadius: 12,
+        bloomRadius: 15,
       },
     },
     rankStroke: '',
@@ -103,4 +103,3 @@ export const Themes: Record<string, ColorTheme> = {
     winnerText: 'white',
   },
 };
-
