@@ -1,15 +1,16 @@
-// 유연서 SD 캐릭터의 은보라색 하나를 기준으로 한 방송용 반투명 UI다.
+// 유연서 SD 캐릭터의 분홍 리본 계열을 기준으로 한 방송용 반투명 UI다.
 :root {
   --ui-font: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
-  --hair-primary: #cbb9ec;
-  --hair-deep: #3d3350;
-  --hair-border: #cbb9ec;
-  --hair-soft: #f0e9fb;
-  --hair-cream: #fbf9ff;
-  --hair-ink: #3d3350;
-  --hair-panel-gradient: linear-gradient(180deg, rgba(203, 185, 236, .48) 0%, rgba(203, 185, 236, .36) 100%);
-  --hair-settings-gradient: linear-gradient(180deg, rgba(203, 185, 236, .44) 0%, rgba(203, 185, 236, .34) 100%);
-  --hair-border-gradient: linear-gradient(180deg, rgba(203, 185, 236, .98) 0%, rgba(203, 185, 236, .98) 100%);
+  --hair-primary: #ff66cc;
+  --hair-deep: #5c2a4b;
+  --hair-border: #ff99cc;
+  --hair-soft: #ffd6eb;
+  --hair-cream: #fff3fa;
+  --hair-ink: #40203a;
+  --hair-button: rgba(184, 79, 145, .94);
+  --hair-panel-gradient: linear-gradient(180deg, rgba(92, 42, 75, .84) 0%, rgba(61, 28, 51, .78) 100%);
+  --hair-settings-gradient: linear-gradient(180deg, rgba(92, 42, 75, .82) 0%, rgba(61, 28, 51, .76) 100%);
+  --hair-border-gradient: linear-gradient(180deg, rgba(255, 153, 204, .98) 0%, rgba(255, 153, 204, .98) 100%);
 }
 
 * {
@@ -97,9 +98,9 @@ canvas {
   padding: 7px 18px 7px 7px;
   border: 2px solid transparent;
   border-radius: 22px;
-  background: linear-gradient(145deg, rgba(251, 249, 255, .95), rgba(232, 224, 248, .92)) padding-box,
+  background: linear-gradient(145deg, rgba(255, 243, 250, .96), rgba(255, 214, 235, .92)) padding-box,
               var(--hair-border-gradient) border-box;
-  box-shadow: 0 14px 34px rgba(16, 11, 42, .36), 0 0 26px rgba(203, 185, 236, .18);
+  box-shadow: 0 14px 34px rgba(46, 12, 35, .38), 0 0 26px rgba(255, 102, 204, .22);
   pointer-events: none;
   backdrop-filter: blur(14px);
 
@@ -109,7 +110,7 @@ canvas {
     display: block;
     object-fit: contain;
     image-rendering: auto;
-    filter: drop-shadow(0 5px 8px rgba(112, 72, 142, .24));
+    filter: drop-shadow(0 5px 8px rgba(184, 79, 145, .26));
   }
 
   strong {
@@ -132,7 +133,7 @@ canvas {
   border-radius: 12px;
   padding: 10px;
   color: var(--hair-cream);
-  box-shadow: 0 10px 32px rgba(20, 13, 46, .56), 0 0 22px rgba(203, 185, 236, .42), inset 0 1px 0 rgba(255, 255, 255, .18);
+  box-shadow: 0 10px 32px rgba(46, 12, 35, .58), 0 0 22px rgba(255, 102, 204, .48), inset 0 1px 0 rgba(255, 255, 255, .18);
   z-index: 999;
   width: clamp(640px, 44vw, 760px);
   min-width: 640px;
@@ -180,7 +181,7 @@ canvas {
       border: 2px solid var(--hair-border);
       border-radius: 12px;
       background: var(--hair-settings-gradient);
-      box-shadow: 0 8px 24px rgba(20, 13, 46, .5), 0 0 20px rgba(203, 185, 236, .38);
+      box-shadow: 0 8px 24px rgba(46, 12, 35, .52), 0 0 20px rgba(255, 102, 204, .44);
 
       .speed-group {
         width: 258px;
@@ -194,7 +195,7 @@ canvas {
     min-height: 6.5rem;
     border: 1px solid var(--hair-soft);
     border-radius: 7px;
-    background: rgba(255, 250, 255, .96);
+    background: rgba(255, 243, 250, .96);
     color: var(--hair-ink);
     font-size: 14pt;
     font-weight: 500;
@@ -203,9 +204,9 @@ canvas {
   }
 
   button, .btn {
-    color: var(--hair-ink);
-    background: rgba(240, 233, 251, .82);
-    border: 1px solid rgba(203, 185, 236, .96);
+    color: var(--hair-cream);
+    background: var(--hair-button);
+    border: 1px solid rgba(255, 153, 204, .9);
     border-radius: 7px;
     padding: 5px 10px;
     font-weight: 600;
@@ -290,7 +291,7 @@ canvas {
     width: 100%;
     border: 1px solid var(--hair-soft);
     border-radius: 6px;
-    background: rgba(255, 250, 255, .96);
+    background: rgba(255, 243, 250, .96);
     color: var(--hair-ink);
     font-weight: 500;
   }
@@ -310,7 +311,7 @@ canvas {
       width: 50px;
       height: 25px;
       border-radius: 25px;
-      background: rgba(151, 126, 186, .78);
+      background: rgba(184, 79, 145, .72);
       top: 0;
       left: 0;
     }
@@ -350,10 +351,10 @@ canvas {
       height: 25px;
       width: 33%;
       border-radius: 0;
-      background: rgba(203, 185, 236, .64);
-      border: 1px solid rgba(239, 225, 248, .7);
+      background: rgba(184, 79, 145, .78);
+      border: 1px solid rgba(255, 153, 204, .72);
       padding: 0;
-      color: var(--hair-ink);
+      color: var(--hair-cream);
       font-weight: 600;
 
       display: flex;
@@ -410,7 +411,7 @@ canvas {
   border: 2px solid var(--hair-border);
   border-radius: 12px;
   background: var(--hair-panel-gradient);
-  box-shadow: 0 0 22px rgba(203, 185, 236, .62), inset 0 1px 0 rgba(255, 255, 255, .18);
+  box-shadow: 0 0 22px rgba(255, 102, 204, .62), inset 0 1px 0 rgba(255, 255, 255, .18);
   color: var(--hair-cream);
 
   &.hidden {
@@ -460,8 +461,8 @@ canvas {
       padding: 0 20px;
       border: 1px solid var(--hair-soft);
       border-radius: 6px;
-      background: rgba(240, 233, 251, .82);
-      color: var(--hair-ink);
+      background: var(--hair-button);
+      color: var(--hair-cream);
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
@@ -501,14 +502,14 @@ canvas {
       padding: 0 14px;
       border: 1px solid var(--hair-soft);
       border-radius: 6px;
-      background: rgba(240, 233, 251, .82);
-      color: var(--hair-ink);
+      background: var(--hair-button);
+      color: var(--hair-cream);
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
 
       &:last-child {
-        background: rgba(203, 185, 236, .62);
+        background: rgba(148, 64, 112, .9);
       }
 
       &:disabled {
@@ -694,3 +695,4 @@ div.toast {
   border: 2px solid black;
   border-radius: 10px;
 }
+
