@@ -6,12 +6,12 @@ export const canvasHeight = 900;
 export const zoomThreshold = 5;
 export const STUCK_DELAY = 5000;
 export const winnerAreaHeight = 168;
-export const YEONSEO_HAIR = '#e7d8f2';
-export const YEONSEO_PINK = '#fcd0dc';
-export const YEONSEO_NEON = YEONSEO_HAIR;
+export const YEONSEO_HAIR = '#dccaf0';
+export const YEONSEO_PINK = '#f6c7d6';
+export const YEONSEO_NEON = '#d0b8ec';
 export const YEONSEO_BORDER = YEONSEO_HAIR;
-export const YEONSEO_NEON_FILL = YEONSEO_HAIR;
-export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_HAIR;
+export const YEONSEO_NEON_FILL = YEONSEO_NEON;
+export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_NEON;
 export const YEONSEO_BORDER_COLORS = [
   YEONSEO_HAIR,
   YEONSEO_HAIR,
