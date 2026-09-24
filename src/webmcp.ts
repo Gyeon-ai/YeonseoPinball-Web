@@ -40,7 +40,6 @@ export function registerPinballTools(): void {
         names: {
           type: 'array',
           minItems: 1,
-          maxItems: 200,
           items: { type: 'string', minLength: 1, maxLength: 80 },
         },
       },
@@ -52,7 +51,7 @@ export function registerPinballTools(): void {
       const candidate = input as { names?: unknown };
       if (!Array.isArray(candidate?.names)) throw new Error('names는 문자열 배열이어야 합니다.');
       const names = candidate.names.map((name) => String(name).trim()).filter(Boolean);
-      if (names.length === 0 || names.length > 200) throw new Error('명단은 1개 이상 200개 이하여야 합니다.');
+      if (names.length === 0) throw new Error('명단은 한 개 이상이어야 합니다.');
       const field = namesInput();
       field.value = names.join('\n');
       field.dispatchEvent(new Event('input', { bubbles: true }));

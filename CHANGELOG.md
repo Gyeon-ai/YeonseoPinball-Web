@@ -3,6 +3,7 @@
 - 2026-09-24:
     - Replaced the silver-lavender settings and timer panels with the brighter rose-mauve palette selected for the final Yeonseo theme.
     - Matched the playfield neon, minimap border and entities, camera viewport indicator, skill effect, and cooldown indicator to the rose-mauve palette.
+    - Removed the remaining 200-entry cap from the optional WebMCP name configuration so every input path follows the unlimited-entry policy.
 
 - 2026-09-24:
     - Reduced panel opacity to reveal the playfield like the Tayo UI while keeping the brighter Yeonseo silver-lavender source color.
