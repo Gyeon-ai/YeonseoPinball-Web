@@ -1,17 +1,18 @@
-// 유연서의 라벤더 머리색과 분홍·호박색 포인트를 방송용 반투명 UI에 사용한다.
+// 유연서 SD 캐릭터의 은보라 머리색과 연분홍 리본을 중심으로,
+// 호박색 눈은 하단의 작은 포인트로만 사용하는 방송용 반투명 UI다.
 :root {
   --ui-font: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
-  --hair-primary: #b99aef;
-  --hair-deep: #2b1f3f;
-  --hair-border: #c7b3ff;
-  --hair-soft: #ede6ff;
-  --hair-cream: #fff8ee;
-  --hair-ink: #332744;
-  --hair-gold: #f6a35e;
-  --hair-gold-light: #ffd6a3;
-  --hair-panel-gradient: linear-gradient(180deg, rgba(58, 41, 79, .64) 0%, rgba(107, 72, 120, .48) 70%, rgba(157, 83, 101, .34) 100%);
-  --hair-settings-gradient: linear-gradient(180deg, rgba(43, 31, 63, .6) 0%, rgba(95, 64, 111, .46) 70%, rgba(148, 76, 95, .32) 100%);
-  --hair-border-gradient: linear-gradient(180deg, rgba(199, 179, 255, .98) 0%, rgba(185, 154, 239, .96) 64%, rgba(242, 181, 207, .94) 84%, rgba(255, 170, 103, .9) 100%);
+  --hair-primary: #cbb9ec;
+  --hair-deep: #3c2d50;
+  --hair-border: #dacdf2;
+  --hair-soft: #f0e9fb;
+  --hair-cream: #fff9f6;
+  --hair-ink: #3a2c49;
+  --hair-gold: #f4a25f;
+  --hair-gold-light: #ffdbb1;
+  --hair-panel-gradient: linear-gradient(180deg, rgba(151, 135, 184, .76) 0%, rgba(184, 155, 197, .68) 72%, rgba(238, 170, 192, .54) 94%, rgba(244, 162, 95, .46) 100%);
+  --hair-settings-gradient: linear-gradient(180deg, rgba(139, 123, 174, .78) 0%, rgba(177, 149, 192, .7) 72%, rgba(235, 166, 190, .54) 94%, rgba(244, 162, 95, .46) 100%);
+  --hair-border-gradient: linear-gradient(180deg, rgba(226, 216, 250, .98) 0%, rgba(203, 185, 236, .97) 70%, rgba(247, 191, 210, .96) 92%, rgba(255, 179, 119, .92) 100%);
 }
 
 * {
@@ -108,8 +109,9 @@ canvas {
   img {
     width: 76px;
     height: 76px;
+    display: block;
     object-fit: contain;
-    image-rendering: pixelated;
+    image-rendering: auto;
     filter: drop-shadow(0 5px 8px rgba(112, 72, 142, .24));
   }
 
@@ -205,8 +207,8 @@ canvas {
 
   button, .btn {
     color: var(--hair-cream);
-    background: rgba(47, 36, 81, .9);
-    border: 1px solid rgba(210, 225, 237, .7);
+    background: rgba(60, 45, 80, .86);
+    border: 1px solid rgba(232, 218, 244, .76);
     border-radius: 7px;
     padding: 5px 10px;
     font-weight: 600;
@@ -311,7 +313,7 @@ canvas {
       width: 50px;
       height: 25px;
       border-radius: 25px;
-      background: rgba(115, 89, 165, .72);
+      background: rgba(151, 126, 186, .78);
       top: 0;
       left: 0;
     }
@@ -351,8 +353,8 @@ canvas {
       height: 25px;
       width: 33%;
       border-radius: 0;
-      background: rgba(112, 82, 151, .7);
-      border: 1px solid rgba(232, 214, 242, .62);
+      background: rgba(139, 110, 174, .76);
+      border: 1px solid rgba(239, 225, 248, .7);
       padding: 0;
       color: var(--hair-cream);
       font-weight: 600;
@@ -461,7 +463,7 @@ canvas {
       padding: 0 20px;
       border: 1px solid var(--hair-soft);
       border-radius: 6px;
-      background: rgba(47, 36, 81, .92);
+      background: rgba(60, 45, 80, .88);
       color: var(--hair-cream);
       font-size: 16px;
       font-weight: 600;
@@ -502,7 +504,7 @@ canvas {
       padding: 0 14px;
       border: 1px solid var(--hair-soft);
       border-radius: 6px;
-      background: rgba(47, 36, 81, .92);
+      background: rgba(60, 45, 80, .88);
       color: var(--hair-cream);
       font-size: 14px;
       font-weight: 600;
@@ -695,3 +697,4 @@ div.toast {
   border: 2px solid black;
   border-radius: 10px;
 }
+
