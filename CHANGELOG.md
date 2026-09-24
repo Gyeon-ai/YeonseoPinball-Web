@@ -1,6 +1,11 @@
 # Changelog
 
 - 2026-09-24:
+    - Reduced panel opacity to reveal the playfield like the Tayo UI while keeping the brighter Yeonseo silver-lavender source color.
+    - Replaced the remaining dark settings and timer buttons with bright lavender controls and dark readable text.
+    - Separated the solid lavender border from the translucent fill so the border layer no longer makes the panel body opaque.
+
+- 2026-09-24:
     - Replaced the overly dark timer and settings backgrounds with translucent Yeonseo silver-lavender `#CBB9EC`.
 
 - 2026-09-24:
