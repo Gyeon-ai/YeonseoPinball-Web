@@ -1,6 +1,9 @@
 # Changelog
 
 - 2026-09-24:
+    - Replaced the overly dark timer and settings backgrounds with translucent Yeonseo silver-lavender `#CBB9EC`.
+
+- 2026-09-24:
     - Matched the timer and settings panels to the dark translucent Tayo-style layout while preserving the single Yeonseo purple palette.
     - Increased the map bar and polyline bloom radius from `12` to `15` to match the Tayo neon intensity.
 
