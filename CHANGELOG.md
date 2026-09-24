@@ -3,6 +3,7 @@
 - 2026-09-24:
     - Unified the settings panel, timer, borders, minimap, skills, and map neon under the single Yeonseo purple `#CBB9EC`.
     - Removed the saturated pink and amber lower-edge accents and the two-tone white/purple neon bars.
+    - Removed the duplicate outline pass from box-shaped bars and normalized map-specific entity colors to the purple theme.
 
 - 2026-09-24:
     - Switched the on-page brand mark to the 512px SD asset with smooth browser downsampling.

@@ -174,12 +174,12 @@ export class RouletteRenderer {
       const transform = this.ctx.getTransform();
       this.ctx.translate(entity.x, entity.y);
       this.ctx.rotate(entity.angle);
-      this.ctx.fillStyle = entity.shape.color ?? this._theme.entity[entity.shape.type].fill;
-      this.ctx.strokeStyle = entity.shape.color ?? this._theme.entity[entity.shape.type].outline;
-      this.ctx.shadowBlur = this._theme.entity[entity.shape.type].bloomRadius;
-      this.ctx.shadowColor =
-        entity.shape.bloomColor ?? entity.shape.color ?? this._theme.entity[entity.shape.type].bloom;
       const shape = entity.shape;
+      const entityTheme = this._theme.entity[shape.type];
+      this.ctx.fillStyle = entityTheme.fill;
+      this.ctx.strokeStyle = entityTheme.outline;
+      this.ctx.shadowBlur = entityTheme.bloomRadius;
+      this.ctx.shadowColor = entityTheme.bloom;
       switch (shape.type) {
         case 'polyline':
           if (shape.points.length > 0) {
@@ -196,7 +196,6 @@ export class RouletteRenderer {
           const h = shape.height * 2;
           this.ctx.rotate(shape.rotation);
           this.ctx.fillRect(-w / 2, -h / 2, w, h);
-          this.ctx.strokeRect(-w / 2, -h / 2, w, h);
           break;
         }
         case 'circle':
@@ -292,3 +291,4 @@ export class RouletteRenderer {
     ctx.restore();
   }
 }
+
