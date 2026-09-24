@@ -1,6 +1,10 @@
 # Changelog
 
 - 2026-09-24:
+    - Unified the settings panel, timer, borders, minimap, skills, and map neon under the single Yeonseo purple `#CBB9EC`.
+    - Removed the saturated pink and amber lower-edge accents and the two-tone white/purple neon bars.
+
+- 2026-09-24:
     - Switched the on-page brand mark to the 512px SD asset with smooth browser downsampling.
     - Brightened the settings and timer palette to match the SD character's silver-lavender hair and pale-pink ribbon, keeping amber as a restrained lower-edge accent.
 
