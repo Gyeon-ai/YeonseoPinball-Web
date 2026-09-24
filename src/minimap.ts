@@ -132,8 +132,8 @@ export class Minimap implements UIObject {
     this.ctx.save();
     entities.forEach((entity) => {
       this.ctx.save();
-      this.ctx.fillStyle = entity.shape.color ?? theme.entity[entity.shape.type].fill;
-      this.ctx.strokeStyle = entity.shape.color ?? theme.entity[entity.shape.type].outline;
+      this.ctx.fillStyle = theme.entity[entity.shape.type].fill;
+      this.ctx.strokeStyle = theme.entity[entity.shape.type].outline;
       this.ctx.translate(entity.x, entity.y);
       this.ctx.rotate(entity.angle);
 
@@ -183,3 +183,4 @@ export class Minimap implements UIObject {
     });
   }
 }
+
