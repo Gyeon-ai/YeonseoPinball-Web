@@ -1,6 +1,10 @@
 # Changelog
 
 - 2026-09-24:
+    - Matched the timer and settings panels to the dark translucent Tayo-style layout while preserving the single Yeonseo purple palette.
+    - Increased the map bar and polyline bloom radius from `12` to `15` to match the Tayo neon intensity.
+
+- 2026-09-24:
     - Unified the settings panel, timer, borders, minimap, skills, and map neon under the single Yeonseo purple `#CBB9EC`.
     - Removed the saturated pink and amber lower-edge accents and the two-tone white/purple neon bars.
     - Removed the duplicate outline pass from box-shaped bars and normalized map-specific entity colors to the purple theme.
@@ -21,4 +25,3 @@
     - Added dedicated 192px and 512px 연서 핀볼 application icons.
     - Separated all names, storage keys, cache scopes, metadata, and assets from other pinball sites.
     - Included `LICENSE` and `NOTICE.md` in the deployed build.
-
