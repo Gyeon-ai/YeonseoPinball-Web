@@ -266,6 +266,7 @@
 
     document.querySelector('#btnStart').addEventListener('click', () => {
       if (!ready) return;
+      setSpeed(1);
       resetResultTimer();
       document.querySelector('#settings').classList.add('game-running');
       window.roulette.start();
