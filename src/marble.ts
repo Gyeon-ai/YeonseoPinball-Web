@@ -132,6 +132,12 @@ export class Marble {
     const alpha = Math.max(0, Math.min(1, interpolation));
     const renderX = this._previousPosition.x + (this._position.x - this._previousPosition.x) * alpha;
     const renderY = this._previousPosition.y + (this._position.y - this._previousPosition.y) * alpha;
+    // Minimap circles use absolute coordinates and never change the transform.
+    // Avoid a DOMMatrix allocation and a browser boundary per marble.
+    if (isMinimap) {
+      this._renderMinimap(ctx, renderX, renderY);
+      return;
+    }
     const renderAngle = this._previousPosition.angle + (this._position.angle - this._previousPosition.angle) * alpha;
     const viewPortHw = viewPort.w / viewPort.zoom / 2;
     const viewPortHh = viewPort.h / viewPort.zoom / 2;
@@ -140,17 +146,12 @@ export class Marble {
     const viewPortTop = viewPort.y - viewPortHh - this.size / 2;
     const viewPortBottom = viewPort.y + viewPortHh;
     if (
-      !isMinimap &&
-      (renderX < viewPortLeft || renderX > viewPortRight || renderY < viewPortTop || renderY > viewPortBottom)
+      renderX < viewPortLeft || renderX > viewPortRight || renderY < viewPortTop || renderY > viewPortBottom
     ) {
       return;
     }
     const transform = ctx.getTransform();
-    if (isMinimap) {
-      this._renderMinimap(ctx, renderX, renderY);
-    } else {
-      this._renderNormal(ctx, zoom, outline, skin, renderX, renderY, renderAngle);
-    }
+    this._renderNormal(ctx, zoom, outline, skin, renderX, renderY, renderAngle);
     ctx.setTransform(transform);
   }
 

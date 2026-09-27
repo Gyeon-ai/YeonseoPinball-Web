@@ -2,6 +2,7 @@ import { Camera } from './camera';
 import { canvasHeight, canvasWidth, initialZoom, Skills, Themes, zoomThreshold } from './data/constants';
 import { type StageDef, stages } from './data/maps';
 import { FastForwader } from './fastForwader';
+import { FixedStepClock } from './fixed-step-clock';
 import type { GameObject } from './gameObject';
 import type { IPhysics } from './IPhysics';
 import { Marble } from './marble';
@@ -21,11 +22,7 @@ import { parseName, shuffle } from './utils/utils';
 export class Roulette extends EventTarget {
   private _marbles: Marble[] = [];
 
-  private _lastTime: number = 0;
-  private _elapsed: number = 0;
-
-  // Box2D의 표준 60Hz 고정 스텝으로 불필요한 물리 연산을 줄인다.
-  private readonly _updateInterval = 1000 / 60;
+  private readonly _clock = new FixedStepClock();
   private _timeScale = 1;
   private _speed = 1;
 
@@ -66,6 +63,10 @@ export class Roulette extends EventTarget {
 
   constructor() {
     super();
+    document.addEventListener('visibilitychange', () => {
+      this._clock.reset();
+      this.fastForwarder?.onMouseUp?.();
+    });
     this._renderer = this.createRenderer();
     this._renderer.init().then(() => {
       this._init().then(() => {
@@ -93,25 +94,19 @@ export class Roulette extends EventTarget {
 
   @bound
   private _update() {
-    if (!this._lastTime) this._lastTime = Date.now();
-    const currentTime = Date.now();
-
-    this._elapsed += (currentTime - this._lastTime) * this._speed * this.fastForwarder.speed;
-    if (this._elapsed > 100) {
-      this._elapsed %= 100;
+    if (document.hidden) {
+      window.requestAnimationFrame(this._update);
+      return;
     }
-    this._lastTime = currentTime;
-
-    while (this._elapsed >= this._updateInterval) {
+    const currentTime = performance.now();
+    this._clock.advance(currentTime, this._speed * this.fastForwarder.speed, (milliseconds) => {
       const timeScale = this._timeScale;
-      const interval = (this._updateInterval / 1000) * timeScale;
-      this.physics.step(interval);
-      this._updateMarbles(this._updateInterval, timeScale);
-      this._particleManager.update(this._updateInterval);
-      this._updateEffects(this._updateInterval);
-      this._elapsed -= this._updateInterval;
-      this._uiObjects.forEach((obj) => obj.update(this._updateInterval));
-    }
+      this.physics.step((milliseconds / 1000) * timeScale);
+      this._updateMarbles(milliseconds, timeScale);
+      this._particleManager.update(milliseconds);
+      this._updateEffects(milliseconds);
+      this._uiObjects.forEach((obj) => obj.update(milliseconds));
+    });
 
     if (this._marbles.length > 1) {
       this._marbles.sort((a, b) => b.y - a.y);
@@ -180,7 +175,7 @@ export class Roulette extends EventTarget {
     const targetIndex = this._winnerRank - this._winners.length;
     if (this._winners.length < this._winnerRank + 1 && this._goalDist < zoomThreshold) {
       if (
-        this._marbles[targetIndex].y > this._stage.zoomY - zoomThreshold * 1.2 &&
+        this._marbles[targetIndex]?.y > this._stage.zoomY - zoomThreshold * 1.2 &&
         (this._marbles[targetIndex - 1] || this._marbles[targetIndex + 1])
       ) {
         return Math.max(0.2, this._goalDist / zoomThreshold);
@@ -199,7 +194,7 @@ export class Roulette extends EventTarget {
     const renderParams = {
       camera: this._camera,
       stage: this._stage,
-      entities: this.physics.getEntities(),
+      entities: this.physics.getEntities(this._clock.interpolation),
       marbles: this._marbles,
       winners: this._winners,
       particleManager: this._particleManager,
@@ -208,7 +203,7 @@ export class Roulette extends EventTarget {
       winner: this._winner,
       size: { x: this._renderer.width, y: this._renderer.height },
       theme: this._theme,
-      interpolation: this._elapsed / this._updateInterval,
+      interpolation: this._clock.interpolation,
     };
     this._renderer.render(renderParams, this._uiObjects);
   }
@@ -300,6 +295,8 @@ export class Roulette extends EventTarget {
   }
 
   public start() {
+    if (this._marbles.length === 0 || this._isRunning) return;
+    this._clock.reset();
     this._isRunning = true;
     this._winnerRank = options.winningRank;
     if (this._winnerRank >= this._marbles.length) {
@@ -312,7 +309,7 @@ export class Roulette extends EventTarget {
   }
 
   public setSpeed(value: number) {
-    if (value <= 0) {
+    if (!Number.isFinite(value) || value <= 0) {
       throw new Error('Speed multiplier must larger than 0');
     }
     this._speed = value;
@@ -401,7 +398,13 @@ export class Roulette extends EventTarget {
   }
 
   public reset() {
-    this.clearMarbles();
+    this._isRunning = false;
+    this._clock.reset();
+    this._timeScale = 1;
+    this._effects = [];
+    this._winner = null;
+    this._winners = [];
+    this.physics.clearMarbles();
     this._clearMap();
     this._loadMap();
     this._goalDist = Infinity;
