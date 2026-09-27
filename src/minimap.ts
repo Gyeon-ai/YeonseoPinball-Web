@@ -183,4 +183,3 @@ export class Minimap implements UIObject {
     });
   }
 }
-

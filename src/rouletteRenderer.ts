@@ -291,4 +291,3 @@ export class RouletteRenderer {
     ctx.restore();
   }
 }
-
