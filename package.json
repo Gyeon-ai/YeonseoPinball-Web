@@ -5,13 +5,13 @@
   "packageManager": "pnpm@11.19.0",
   "license": "MIT",
   "devDependencies": {
-    "@biomejs/biome": "2.4.4",
+    "@biomejs/biome": "2.5.14",
     "@parcel/config-default": "^2.16.4",
     "@parcel/packager-raw-url": "^2.16.4",
     "@parcel/transformer-sass": "^2.16.4",
     "@parcel/transformer-webmanifest": "^2.16.4",
     "parcel": "^2.16.4",
-    "typescript": "^5.6.3"
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "lint": "biome check --fix src/",
