@@ -13,10 +13,7 @@ export const YEONSEO_NEON = '#f0c9db';
 export const YEONSEO_BORDER = YEONSEO_HAIR;
 export const YEONSEO_NEON_FILL = YEONSEO_NEON;
 export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_NEON;
-export const YEONSEO_BORDER_COLORS = [
-  YEONSEO_HAIR,
-  YEONSEO_HAIR,
-] as const;
+export const YEONSEO_BORDER_COLORS = [YEONSEO_HAIR, YEONSEO_HAIR] as const;
 export const UI_FONT_FAMILY = `'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif`;
 
 export enum Skills {
@@ -105,4 +102,3 @@ export const Themes: Record<string, ColorTheme> = {
     winnerText: 'white',
   },
 };
-
