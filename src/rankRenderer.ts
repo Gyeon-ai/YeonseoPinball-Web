@@ -74,11 +74,12 @@ export class RankRenderer implements UIObject {
     ctx.textBaseline = 'top';
     ctx.font = `500 10pt ${UI_FONT_FAMILY}`;
     ctx.fillStyle = '#c9c2e6';
-    ctx.fillText(`${winners.length} / ${winners.length + marbles.length}`, width - 5, this.fontHeight);
+    ctx.fillText(`${winners.length} / ${winners.length + marbles.length}`, width - 5, 2);
 
     ctx.beginPath();
+    const rankTop = this.fontHeight + 10;
     const rankWidth = Math.max(150, width * .5);
-    ctx.rect(width - rankWidth, this.fontHeight + 2, rankWidth, this.maxY);
+    ctx.rect(width - rankWidth, rankTop, rankWidth, height - rankTop);
     ctx.clip();
 
     ctx.translate(0, -startY);
@@ -93,15 +94,15 @@ export class RankRenderer implements UIObject {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
         if (rank === winnerRank) {
           const text = `${marble.name} #${rank + 1}`;
-          ctx.strokeText(text, startX, 20 + y);
-          ctx.fillText(text, startX, 20 + y);
+          ctx.strokeText(text, startX, rankTop + y);
+          ctx.fillText(text, startX, rankTop + y);
           const crownWidth = ctx.measureText('👑').width;
           const crownX = startX - ctx.measureText(text).width - 3 - crownWidth / 2;
-          this.drawCrown(ctx, crownX, 20 + y + this.fontHeight / 2);
+          this.drawCrown(ctx, crownX, rankTop + y + this.fontHeight / 2);
         } else {
           const text = `\u2714 ${marble.name} #${rank + 1}`;
-          ctx.strokeText(text, startX, 20 + y);
-          ctx.fillText(text, startX, 20 + y);
+          ctx.strokeText(text, startX, rankTop + y);
+          ctx.fillText(text, startX, rankTop + y);
         }
       }
     });
@@ -110,8 +111,8 @@ export class RankRenderer implements UIObject {
       const y = (rank + winners.length) * this.fontHeight;
       if (y >= startY && y <= startY + height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
-        ctx.strokeText(`${marble.name} #${rank + 1 + winners.length}`, startX, 20 + y);
-        ctx.fillText(`${marble.name} #${rank + 1 + winners.length}`, startX, 20 + y);
+        ctx.strokeText(`${marble.name} #${rank + 1 + winners.length}`, startX, rankTop + y);
+        ctx.fillText(`${marble.name} #${rank + 1 + winners.length}`, startX, rankTop + y);
       }
     });
     ctx.restore();

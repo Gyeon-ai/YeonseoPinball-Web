@@ -1,5 +1,5 @@
 import type { Camera } from './camera';
-import { canvasHeight, canvasWidth, initialZoom, Themes, UI_FONT_FAMILY, winnerAreaHeight } from './data/constants';
+import { canvasHeight, canvasWidth, initialZoom, Themes, UI_FONT_FAMILY } from './data/constants';
 import type { StageDef } from './data/maps';
 import type { GameObject } from './gameObject';
 import type { Marble } from './marble';
@@ -146,25 +146,43 @@ export class RouletteRenderer {
     this.ctx.textBaseline = 'top';
     this.ctx.font = `400 0.4pt ${UI_FONT_FAMILY}`;
     this.ctx.lineWidth = 3 / (renderParameters.camera.zoom + initialZoom);
+    let marbleTransform: DOMMatrix | null = null;
     renderParameters.camera.renderScene(this.ctx, () => {
       this.onBeforeEntities();
       this.renderEntities(renderParameters.entities);
       this.renderEffects(renderParameters);
-      this.renderMarbles(renderParameters);
+      marbleTransform = this.ctx.getTransform();
     });
     this.ctx.restore();
     this.onAfterScene();
 
-    uiObjects.forEach((obj) =>
-      obj.render(this.ctx, renderParameters, this._sceneCanvas.width, this._sceneCanvas.height)
-    );
-    renderParameters.particleManager.render(this.ctx);
-
+    // Keep the map at scene resolution, but draw marbles and UI at display resolution.
     this._displayCtx.drawImage(this._sceneCanvas, 0, 0, this._canvas.width, this._canvas.height);
-
-    // 당첨 UI는 저해상도 장면 캔버스를 거쳐 두 번 확대하지 않고 출력 캔버스에 바로 그린다.
     const displayScale = this._canvas.width / this._sceneCanvas.width;
-    this.renderWinner(renderParameters, this._displayCtx, this._canvas.width, this._canvas.height, displayScale);
+    if (marbleTransform) {
+      const transform: DOMMatrix = marbleTransform;
+      this._displayCtx.save();
+      this._displayCtx.setTransform(
+        transform.a * displayScale,
+        transform.b * displayScale,
+        transform.c * displayScale,
+        transform.d * displayScale,
+        transform.e * displayScale,
+        transform.f * displayScale
+      );
+      this.renderMarbles(renderParameters, this._displayCtx);
+      this._displayCtx.restore();
+    }
+
+    this._displayCtx.save();
+    this._displayCtx.scale(displayScale, displayScale);
+    uiObjects.forEach((obj) =>
+      obj.render(this._displayCtx, renderParameters, this._sceneCanvas.width, this._sceneCanvas.height)
+    );
+    renderParameters.particleManager.render(this._displayCtx);
+    this._displayCtx.restore();
+
+    this.renderWinner(renderParameters, this._displayCtx, this._canvas.width, this._canvas.height);
   }
 
   private renderEntities(entities: MapEntityState[]) {
@@ -213,13 +231,13 @@ export class RouletteRenderer {
     effects.forEach((effect) => effect.render(this.ctx, camera.zoom * initialZoom, this._theme));
   }
 
-  private renderMarbles({ marbles, camera, winnerRank, winners, size, interpolation }: RenderParameters) {
+  private renderMarbles({ marbles, camera, winnerRank, winners, size, interpolation }: RenderParameters, ctx: CanvasRenderingContext2D) {
     const winnerIndex = winnerRank - winners.length;
 
     const viewPort = { x: camera.x, y: camera.y, w: size.x, h: size.y, zoom: camera.zoom * initialZoom };
     marbles.forEach((marble, i) => {
       marble.render(
-        this.ctx,
+        ctx,
         camera.zoom * initialZoom,
         i === winnerIndex,
         false,
@@ -235,32 +253,33 @@ export class RouletteRenderer {
     { winner, theme }: RenderParameters,
     ctx: CanvasRenderingContext2D,
     width: number,
-    height: number,
-    scale: number
+    height: number
   ) {
     if (!winner) return;
+    const canvasRect = this._canvas.getBoundingClientRect();
+    const timerRect = document.getElementById('resultTimerOverlay')?.getBoundingClientRect();
+    if (!timerRect || canvasRect.width <= 0) return;
+
+    const cssScale = width / canvasRect.width;
+    const settingsRect = document.getElementById('settings')?.getBoundingClientRect();
+    const settingsTop = settingsRect?.height ? settingsRect.top : canvasRect.bottom - 150;
+    const roomBelowTimer = (settingsTop - timerRect.bottom - 30) / 156;
+    const winnerScale = Math.max(1, Math.min(2, canvasRect.width / 960, roomBelowTimer));
+    const panelWidth = Math.min(timerRect.width * winnerScale * cssScale, width - 32 * cssScale);
+    const panelX = (timerRect.left + timerRect.width / 2 - canvasRect.left) * cssScale - panelWidth / 2;
+    const panelY = (timerRect.bottom - canvasRect.top + 14) * cssScale;
+    const panelHeight = Math.min(156 * winnerScale * cssScale, height - panelY - 16 * cssScale);
+    if (panelHeight < 72 * cssScale) return;
+
     ctx.save();
     ctx.fillStyle = theme.winnerBackground;
-    const compact = width <= 600;
-    const scaledWinnerAreaHeight = compact
-      ? Math.min(185, Math.max(150, height * .22))
-      : winnerAreaHeight * scale;
-    const panelX = compact ? 16 : width / 2;
-    const panelWidth = compact ? width - 32 : width / 2;
-    const panelY = compact ? Math.max(230, height * .29) : height - scaledWinnerAreaHeight;
-    ctx.fillRect(panelX, panelY, panelWidth, scaledWinnerAreaHeight);
+    ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
 
-    // 원본 픽셀을 정수 배율로 확대해 당첨 퍼스나콘이 흐려지지 않게 한다.
+    // Keep enlarged pixel art crisp; smooth only when shrinking a source image.
     const marbleImage = this.getMarbleImage(winner.name);
-    const targetMarbleSize = compact ? 100 : 100 * scale;
-    const marbleSize = marbleImage
-      ? Math.min(
-          marbleImage.naturalWidth * Math.max(1, Math.round(targetMarbleSize / marbleImage.naturalWidth)),
-          scaledWinnerAreaHeight * .7
-        )
-      : Math.min(targetMarbleSize, scaledWinnerAreaHeight * .7);
-    const marbleCenterX = panelX + panelWidth - marbleSize / 2 - (compact ? 14 : 20 * scale);
-    const nameCenterY = panelY + scaledWinnerAreaHeight * .64;
+    const marbleSize = Math.min(92 * winnerScale * cssScale, panelHeight * .54);
+    const marbleCenterX = panelX + panelWidth - 18 * winnerScale * cssScale - marbleSize / 2;
+    const nameCenterY = panelY + panelHeight * .7;
     const marbleCenterY = nameCenterY;
 
     if (marbleImage) {
@@ -280,22 +299,22 @@ export class RouletteRenderer {
       ctx.fill();
     }
 
-    const textRightX = marbleCenterX - marbleSize / 2 - (compact ? 10 : 18 * scale);
-    const textWidth = Math.max(1, textRightX - panelX - (compact ? 10 : 18 * scale));
-    ctx.textAlign = 'right';
+    const textWidth = Math.max(1, panelWidth - marbleSize - 54 * winnerScale * cssScale);
+    const textCenterX = panelX + 18 * winnerScale * cssScale + textWidth / 2;
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.strokeStyle = theme.winnerOutline;
-    ctx.lineWidth = 3 * scale;
-    ctx.font = `700 ${Math.min(compact ? 34 : 42 * scale, scaledWinnerAreaHeight * .25)}px ${UI_FONT_FAMILY}`;
+    ctx.lineWidth = 3 * winnerScale * cssScale;
+    ctx.font = `700 ${Math.min(42 * winnerScale * cssScale, panelHeight * .28)}px ${UI_FONT_FAMILY}`;
     ctx.fillStyle = theme.winnerText;
     if (theme.winnerOutline) {
-      ctx.strokeText('당첨', textRightX, panelY + scaledWinnerAreaHeight * .24);
+      ctx.strokeText('당첨', textCenterX, panelY + panelHeight * .28);
     }
-    ctx.fillText('당첨', textRightX, panelY + scaledWinnerAreaHeight * .24);
+    ctx.fillText('당첨', textCenterX, panelY + panelHeight * .28);
 
     const characters = Array.from(winner.name);
-    const maxNameSize = Math.min(compact ? 37 : 58 * scale, scaledWinnerAreaHeight * .37);
-    const nameBlockHeight = scaledWinnerAreaHeight * .42;
+    const maxNameSize = Math.min(58 * winnerScale * cssScale, panelHeight * .37);
+    const nameBlockHeight = panelHeight * .46;
     let nameLines = [winner.name];
     let nameSize = 0;
     for (let lineCount = 1; lineCount <= Math.min(3, characters.length); lineCount++) {
@@ -317,9 +336,9 @@ export class RouletteRenderer {
     nameLines.forEach((line, index) => {
       const lineY = nameCenterY + (index - (nameLines.length - 1) / 2) * lineHeight;
       if (theme.winnerOutline) {
-        ctx.strokeText(line, textRightX, lineY);
+        ctx.strokeText(line, textCenterX, lineY);
       }
-      ctx.fillText(line, textRightX, lineY);
+      ctx.fillText(line, textCenterX, lineY);
     });
     ctx.restore();
   }
