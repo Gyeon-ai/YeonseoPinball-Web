@@ -2,23 +2,13 @@ export function rad(degree: number) {
   return (Math.PI * degree) / 180;
 }
 
-function getRegexValue(regex: RegExp, str: string) {
-  const result = regex.exec(str);
-  return result ? result[1] : '';
-}
-
 export function parseName(nameStr: string) {
-  const weightRegex = /\/(\d+)/;
-  const countRegex = /\*(\d+)/;
-  const hasWeight = weightRegex.test(nameStr);
-  const hasCount = countRegex.test(nameStr);
-  const name = getRegexValue(/^\s*([^/*]+)?/, nameStr);
+  const countMatch = /\*(\d+)\s*$/.exec(nameStr);
+  const name = (countMatch ? nameStr.slice(0, countMatch.index) : nameStr).trim();
   if (!name) return null;
-  const weight = hasWeight ? parseInt(getRegexValue(weightRegex, nameStr), 10) : 1;
-  const count = hasCount ? parseInt(getRegexValue(countRegex, nameStr), 10) : 1;
+  const count = countMatch ? parseInt(countMatch[1], 10) : 1;
   return {
     name,
-    weight,
     count,
   };
 }

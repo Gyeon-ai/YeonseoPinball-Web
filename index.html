@@ -33,16 +33,11 @@
   }
 
   function parseName(nameStr) {
-    const weightRegex = /(\/\d+)/;
-    const countRegex = /(\*\d+)/;
-    const hasWeight = weightRegex.test(nameStr);
-    const hasCount = countRegex.test(nameStr);
-    const name = /^\s*([^\/*]+)?/.exec(nameStr)[1];
-    const weight = hasWeight ? parseInt(weightRegex.exec(nameStr)[1].replace('/', '')) : 1;
-    const count = hasCount ? parseInt(countRegex.exec(nameStr)[1].replace('*', '')) : 1;
+    const countMatch = /\*(\d+)\s*$/.exec(nameStr);
+    const name = (countMatch ? nameStr.slice(0, countMatch.index) : nameStr).trim();
+    const count = countMatch ? parseInt(countMatch[1], 10) : 1;
     return {
       name,
-      weight,
       count,
     };
   }
@@ -235,7 +230,7 @@
       const nameCounts = {};
       nameSource.forEach(nameSrc => {
         const name = parseName(nameSrc);
-        const key = name.weight > 1 ? `${name.name}/${name.weight}` : name.name;
+        const key = name.name;
         if (!nameSet.has(key)) {
           nameSet.add(key);
           nameCounts[key] = 0;

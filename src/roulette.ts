@@ -331,26 +331,18 @@ export class Roulette extends EventTarget {
     this.reset();
     const arr = names.slice();
 
-    let maxWeight = -Infinity;
-    let minWeight = Infinity;
-
     const members = arr
       .map((nameString) => {
         const result = parseName(nameString);
         if (!result) return null;
-        const { name, weight, count } = result;
-        if (weight > maxWeight) maxWeight = weight;
-        if (weight < minWeight) minWeight = weight;
-        return { name, weight, count };
+        const { name, count } = result;
+        return { name, count };
       })
       .filter((member) => !!member);
-
-    const gap = maxWeight - minWeight;
 
     let totalCount = 0;
     members.forEach((member) => {
       if (member) {
-        member.weight = 0.1 + (gap ? (member.weight - minWeight) / gap : 0);
         totalCount += member.count;
       }
     });
@@ -364,7 +356,7 @@ export class Roulette extends EventTarget {
       if (member) {
         for (let j = 0; j < member.count; j++) {
           const order = orders.pop() || 0;
-          this._marbles.push(new Marble(this.physics, order, totalCount, member.name, member.weight));
+          this._marbles.push(new Marble(this.physics, order, totalCount, member.name));
         }
       }
     });
