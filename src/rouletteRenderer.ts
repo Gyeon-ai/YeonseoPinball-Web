@@ -25,7 +25,6 @@ export type RenderParameters = {
 };
 
 const MAX_DISPLAY_WIDTH = 1920;
-const WINNER_TEXT_OFFSET = 30;
 const PERSONACON_URLS = [
   new URL('../assets/personacons/01-month.png', import.meta.url),
   new URL('../assets/personacons/03-month.png', import.meta.url),
@@ -242,20 +241,31 @@ export class RouletteRenderer {
     if (!winner) return;
     ctx.save();
     ctx.fillStyle = theme.winnerBackground;
-    const scaledWinnerAreaHeight = winnerAreaHeight * scale;
-    ctx.fillRect(width / 2, height - scaledWinnerAreaHeight, width / 2, scaledWinnerAreaHeight);
+    const compact = width <= 600;
+    const scaledWinnerAreaHeight = compact
+      ? Math.min(185, Math.max(150, height * .22))
+      : winnerAreaHeight * scale;
+    const panelX = compact ? 16 : width / 2;
+    const panelWidth = compact ? width - 32 : width / 2;
+    const panelY = compact ? Math.max(230, height * .29) : height - scaledWinnerAreaHeight;
+    ctx.fillRect(panelX, panelY, panelWidth, scaledWinnerAreaHeight);
 
     // 원본 픽셀을 정수 배율로 확대해 당첨 퍼스나콘이 흐려지지 않게 한다.
     const marbleImage = this.getMarbleImage(winner.name);
-    const targetMarbleSize = 100 * scale;
+    const targetMarbleSize = compact ? 100 : 100 * scale;
     const marbleSize = marbleImage
-      ? marbleImage.naturalWidth * Math.max(1, Math.round(targetMarbleSize / marbleImage.naturalWidth))
-      : targetMarbleSize;
-    const marbleCenterX = width - marbleSize / 2 - 20 * scale;
-    const marbleCenterY = height - scaledWinnerAreaHeight / 2;
+      ? Math.min(
+          marbleImage.naturalWidth * Math.max(1, Math.round(targetMarbleSize / marbleImage.naturalWidth)),
+          scaledWinnerAreaHeight * .7
+        )
+      : Math.min(targetMarbleSize, scaledWinnerAreaHeight * .7);
+    const marbleCenterX = panelX + panelWidth - marbleSize / 2 - (compact ? 14 : 20 * scale);
+    const nameCenterY = panelY + scaledWinnerAreaHeight * .64;
+    const marbleCenterY = nameCenterY;
 
     if (marbleImage) {
-      ctx.imageSmoothingEnabled = false;
+      ctx.imageSmoothingEnabled = marbleImage.naturalWidth > marbleSize;
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(
         marbleImage,
         marbleCenterX - marbleSize / 2,
@@ -270,24 +280,47 @@ export class RouletteRenderer {
       ctx.fill();
     }
 
-    ctx.fillStyle = theme.winnerText;
-    ctx.strokeStyle = theme.winnerOutline;
-
-    ctx.font = `700 ${48 * scale}px ${UI_FONT_FAMILY}`;
+    const textRightX = marbleCenterX - marbleSize / 2 - (compact ? 10 : 18 * scale);
+    const textWidth = Math.max(1, textRightX - panelX - (compact ? 10 : 18 * scale));
     ctx.textAlign = 'right';
-    ctx.lineWidth = 4 * scale;
-    const textRightX = marbleCenterX - marbleSize / 2 - 20 * scale;
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = theme.winnerOutline;
+    ctx.lineWidth = 3 * scale;
+    ctx.font = `700 ${Math.min(compact ? 34 : 42 * scale, scaledWinnerAreaHeight * .25)}px ${UI_FONT_FAMILY}`;
+    ctx.fillStyle = theme.winnerText;
     if (theme.winnerOutline) {
-      ctx.strokeText('Winner', textRightX, height - 120 * scale + WINNER_TEXT_OFFSET * scale);
+      ctx.strokeText('당첨', textRightX, panelY + scaledWinnerAreaHeight * .24);
     }
+    ctx.fillText('당첨', textRightX, panelY + scaledWinnerAreaHeight * .24);
 
-    ctx.fillText('Winner', textRightX, height - 120 * scale + WINNER_TEXT_OFFSET * scale);
-    ctx.font = `700 ${72 * scale}px ${UI_FONT_FAMILY}`;
-    ctx.fillStyle = `hsl(${winner.hue} 100% ${theme.marbleLightness})`;
-    if (theme.winnerOutline) {
-      ctx.strokeText(winner.name, textRightX, height - 55 * scale + WINNER_TEXT_OFFSET * scale);
+    const characters = Array.from(winner.name);
+    const maxNameSize = Math.min(compact ? 37 : 58 * scale, scaledWinnerAreaHeight * .37);
+    const nameBlockHeight = scaledWinnerAreaHeight * .42;
+    let nameLines = [winner.name];
+    let nameSize = 0;
+    for (let lineCount = 1; lineCount <= Math.min(3, characters.length); lineCount++) {
+      const lines = Array.from({ length: lineCount }, (_, index) =>
+        characters.slice(Math.floor(index * characters.length / lineCount), Math.floor((index + 1) * characters.length / lineCount)).join('')
+      );
+      let candidateSize = Math.min(maxNameSize, nameBlockHeight / (lineCount * 1.08));
+      ctx.font = `700 ${candidateSize}px ${UI_FONT_FAMILY}`;
+      const widestLine = Math.max(...lines.map((line) => ctx.measureText(line).width));
+      candidateSize *= Math.min(1, textWidth / Math.max(1, widestLine));
+      if (candidateSize > nameSize) {
+        nameLines = lines;
+        nameSize = candidateSize;
+      }
     }
-    ctx.fillText(winner.name, textRightX, height - 55 * scale + WINNER_TEXT_OFFSET * scale);
+    ctx.font = `700 ${nameSize}px ${UI_FONT_FAMILY}`;
+    ctx.fillStyle = `hsl(${winner.hue} 100% ${theme.marbleLightness})`;
+    const lineHeight = nameSize * 1.08;
+    nameLines.forEach((line, index) => {
+      const lineY = nameCenterY + (index - (nameLines.length - 1) / 2) * lineHeight;
+      if (theme.winnerOutline) {
+        ctx.strokeText(line, textRightX, lineY);
+      }
+      ctx.fillText(line, textRightX, lineY);
+    });
     ctx.restore();
   }
 }

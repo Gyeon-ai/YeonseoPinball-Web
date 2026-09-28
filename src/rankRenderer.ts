@@ -71,12 +71,14 @@ export class RankRenderer implements UIObject {
 
     ctx.save();
     ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
     ctx.font = `500 10pt ${UI_FONT_FAMILY}`;
     ctx.fillStyle = '#c9c2e6';
     ctx.fillText(`${winners.length} / ${winners.length + marbles.length}`, width - 5, this.fontHeight);
 
     ctx.beginPath();
-    ctx.rect(width - 150, this.fontHeight + 2, width, this.maxY);
+    const rankWidth = Math.max(150, width * .5);
+    ctx.rect(width - rankWidth, this.fontHeight + 2, rankWidth, this.maxY);
     ctx.clip();
 
     ctx.translate(0, -startY);
@@ -87,21 +89,41 @@ export class RankRenderer implements UIObject {
     }
     winners.forEach((marble: { hue: number; name: string }, rank: number) => {
       const y = rank * this.fontHeight;
-      if (y >= startY && y <= startY + ctx.canvas.height) {
+      if (y >= startY && y <= startY + height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
-        ctx.strokeText(`${rank === winnerRank ? '👑' : '\u2714'} ${marble.name} #${rank + 1}`, startX, 20 + y);
-        ctx.fillText(`${rank === winnerRank ? '👑' : '\u2714'} ${marble.name} #${rank + 1}`, startX, 20 + y);
+        if (rank === winnerRank) {
+          const text = `${marble.name} #${rank + 1}`;
+          ctx.strokeText(text, startX, 20 + y);
+          ctx.fillText(text, startX, 20 + y);
+          const crownWidth = ctx.measureText('👑').width;
+          const crownX = startX - ctx.measureText(text).width - 3 - crownWidth / 2;
+          this.drawCrown(ctx, crownX, 20 + y + this.fontHeight / 2);
+        } else {
+          const text = `\u2714 ${marble.name} #${rank + 1}`;
+          ctx.strokeText(text, startX, 20 + y);
+          ctx.fillText(text, startX, 20 + y);
+        }
       }
     });
     ctx.font = `500 10pt ${UI_FONT_FAMILY}`;
     marbles.forEach((marble: { hue: number; name: string }, rank: number) => {
       const y = (rank + winners.length) * this.fontHeight;
-      if (y >= startY && y <= startY + ctx.canvas.height) {
+      if (y >= startY && y <= startY + height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
         ctx.strokeText(`${marble.name} #${rank + 1 + winners.length}`, startX, 20 + y);
         ctx.fillText(`${marble.name} #${rank + 1 + winners.length}`, startX, 20 + y);
       }
     });
+    ctx.restore();
+  }
+
+  private drawCrown(ctx: CanvasRenderingContext2D, centerX: number, centerY: number) {
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(-5 * Math.PI / 180);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('👑', 0, 0);
     ctx.restore();
   }
 
