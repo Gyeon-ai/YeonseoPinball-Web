@@ -9,7 +9,7 @@ for(const [map,stage] of stages.entries())test(`Box2D map ${map}: actual marbles
   let seed=20260928+map;Math.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const p=new Box2dPhysics();await p.init();globalThis.fetch=savedFetch;
   try {
-    p.createStage(stage);const marbles=Array.from({length:30},(_,id)=>new Marble(p,id,30,`b${id}`,.1));
+    p.createStage(stage);const marbles=Array.from({length:30},(_,id)=>new Marble(p,id,30,`b${id}`));
     p.start();marbles.forEach(m=>m.isActive=true);let finished=false;
     for(let step=0;step<12000&&!finished;step++){
       p.step(1/60);
