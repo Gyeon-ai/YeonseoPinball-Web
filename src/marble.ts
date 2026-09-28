@@ -14,13 +14,12 @@ export class Marble {
   color: string = 'red';
   hue: number = 0;
   impact: number = 0;
-  weight: number = 1;
   skill: Skills = Skills.None;
   isActive: boolean = false;
 
-  private _skillRate = 0.0005;
-  private _coolTime = 5000;
-  private _maxCoolTime = 5000;
+  private _skillRate = 0.02;
+  private _coolTime = 0;
+  private _maxCoolTime = 4600;
   private _stuckTime = 0;
   private lastPosition: VectorLike = { x: 0, y: 0 };
   private _previousPosition: { x: number; y: number; angle: number } = { x: 0, y: 0, angle: 0 };
@@ -55,14 +54,11 @@ export class Marble {
     return this.position.angle;
   }
 
-  constructor(physics: IPhysics, order: number, max: number, name?: string, weight: number = 1) {
+  constructor(physics: IPhysics, order: number, max: number, name?: string) {
     this.name = name || `M${order}`;
-    this.weight = weight;
     this.physics = physics;
 
-    this._maxCoolTime = 1000 + (1 - this.weight) * 4000;
     this._coolTime = this._maxCoolTime * Math.random();
-    this._skillRate = 0.2 * this.weight;
 
     const maxLine = Math.ceil(max / 10);
     const line = Math.floor(order / 10);
