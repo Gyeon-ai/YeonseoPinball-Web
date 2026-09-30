@@ -5,6 +5,28 @@ import type { Rect } from './types/rect.type';
 import type { MouseEventArgs, UIObject } from './UIObject';
 import { bound } from './utils/bound.decorator';
 
+const MAX_RANK_NAME_LENGTH = 12;
+
+function formatRankRow(
+  name: string,
+  ctx: CanvasRenderingContext2D,
+  suffix: string,
+  prefix: string,
+  maxWidth: number,
+  iconWidth = 0
+): string {
+  const characters = Array.from(name);
+  const visible = characters.slice(0, MAX_RANK_NAME_LENGTH);
+  let shortened = characters.length > MAX_RANK_NAME_LENGTH;
+  let text = `${prefix}${visible.join('')}${shortened ? '…' : ''}${suffix}`;
+  while (visible.length > 0 && ctx.measureText(text).width + iconWidth > maxWidth) {
+    visible.pop();
+    shortened = true;
+    text = `${prefix}${visible.join('')}…${suffix}`;
+  }
+  return text;
+}
+
 export class RankRenderer implements UIObject {
   private _currentY = 0;
   private _targetY = 0;
@@ -84,6 +106,7 @@ export class RankRenderer implements UIObject {
 
     ctx.translate(0, -startY);
     ctx.font = `700 11pt ${UI_FONT_FAMILY}`;
+    const maxRowWidth = width * 0.3;
     if (theme.rankStroke) {
       ctx.lineWidth = 2;
       ctx.strokeStyle = theme.rankStroke;
@@ -93,14 +116,14 @@ export class RankRenderer implements UIObject {
       if (y >= startY && y <= startY + height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
         if (rank === winnerRank) {
-          const text = `${marble.name} #${rank + 1}`;
+          const crownWidth = ctx.measureText('👑').width;
+          const text = formatRankRow(marble.name, ctx, ` #${rank + 1}`, '', maxRowWidth, crownWidth + 3);
           ctx.strokeText(text, startX, rankTop + y);
           ctx.fillText(text, startX, rankTop + y);
-          const crownWidth = ctx.measureText('👑').width;
           const crownX = startX - ctx.measureText(text).width - 3 - crownWidth / 2;
           this.drawCrown(ctx, crownX, rankTop + y + this.fontHeight / 2);
         } else {
-          const text = `\u2714 ${marble.name} #${rank + 1}`;
+          const text = formatRankRow(marble.name, ctx, ` #${rank + 1}`, '\u2714 ', maxRowWidth);
           ctx.strokeText(text, startX, rankTop + y);
           ctx.fillText(text, startX, rankTop + y);
         }
@@ -111,8 +134,9 @@ export class RankRenderer implements UIObject {
       const y = (rank + winners.length) * this.fontHeight;
       if (y >= startY && y <= startY + height) {
         ctx.fillStyle = `hsl(${marble.hue} 100% ${theme.marbleLightness}`;
-        ctx.strokeText(`${marble.name} #${rank + 1 + winners.length}`, startX, rankTop + y);
-        ctx.fillText(`${marble.name} #${rank + 1 + winners.length}`, startX, rankTop + y);
+        const text = formatRankRow(marble.name, ctx, ` #${rank + 1 + winners.length}`, '', maxRowWidth);
+        ctx.strokeText(text, startX, rankTop + y);
+        ctx.fillText(text, startX, rankTop + y);
       }
     });
     ctx.restore();
