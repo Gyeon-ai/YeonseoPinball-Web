@@ -146,7 +146,11 @@ export class Roulette extends EventTarget {
           this._winnerRank === this._winners.length &&
           this._winnerRank === this._totalMarbleCount - 1
         ) {
-          this._finishRound(this._marbles[i + 1]);
+          // Last-place mode: the winner is the one marble still above the goal. It is not always at i + 1,
+          // because the list is sorted once per frame, not per step (an empty slot here froze the game).
+          const goalY = this._stage.goalY;
+          const lastMarble = this._marbles.find((other) => other.y <= goalY);
+          if (lastMarble) this._finishRound(lastMarble);
         }
         removalIds.push(marble.id);
       }
