@@ -307,14 +307,6 @@
       simpleToast(e.detail);
     });
 
-    const toggleBtn = document.querySelector('#btnToggleSettings');
-    const collapsible = document.querySelector('.collapsible-rows');
-    toggleBtn.addEventListener('click', () => {
-      collapsible.classList.toggle('collapsed');
-      toggleBtn.querySelector('.toggle-arrow').textContent =
-        collapsible.classList.contains('collapsed') ? '▲' : '▼';
-    });
-
     document.querySelector('#btnShuffle').click();
 
     const maps = window.roulette.getMaps();
@@ -356,11 +348,7 @@
 </header>
 <div id="settings" class="settings">
   <div class="right">
-    <button id="btnToggleSettings" class="btn-toggle-settings">
-      <span>설정</span>
-      <i class="toggle-arrow">▲</i>
-    </button>
-    <div class="collapsible-rows collapsed">
+    <div class="collapsible-rows">
       <div class="row">
         <select id="sltMap" aria-label="맵"></select>
       </div>
