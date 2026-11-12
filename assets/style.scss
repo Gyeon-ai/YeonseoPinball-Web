@@ -160,7 +160,6 @@ canvas {
     box-shadow: none;
 
     div.left,
-    .btn-toggle-settings,
     .setup-actions,
     div.right div.row:not(.speed-row) {
       display: none;
@@ -231,10 +230,6 @@ canvas {
     flex-shrink: 1;
     order: 1;
     min-width: 0;
-  }
-
-  .btn-toggle-settings {
-    display: none;
   }
 
   div.right {
@@ -570,29 +565,6 @@ canvas {
     &.hide {
       opacity: 0;
       visibility: hidden;
-    }
-
-    .btn-toggle-settings {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      margin-bottom: 6px;
-      cursor: pointer;
-      font-size: 11pt;
-
-      .toggle-arrow {
-        font-style: normal;
-      }
-    }
-
-    .collapsible-rows.collapsed {
-      display: none;
-    }
-
-    &.game-running .collapsible-rows.collapsed {
-      display: block;
     }
 
     textarea {
