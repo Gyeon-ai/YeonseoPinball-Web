@@ -5,11 +5,20 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# 2026-11-17: gh-pages 브랜치(산출물에 그림이 남음) 대신 Pages 아티팩트로 배포한다(actions/deploy-pages).
+# 저장소 설정 Pages의 Source가 "GitHub Actions"여야 한다.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,14 +30,33 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      # 스트리머 그림은 저장소에 암호화(.png.enc)로만 있다. 비밀 값으로 풀고, 없거나 틀리면 여기서 멈춘다.
+      # 비밀 값은 GitHub가 로그에서 가린다. 스크립트도 값을 출력하지 않는다.
+      - name: Decrypt personacons
+        env:
+          PERSONACON_KEY: ${{ secrets.PERSONACON_KEY }}
+        run: node scripts/decrypt-personacons.mjs
+
       - name: Verify Box2D runtime
         run: |
           node --import ./scripts/register-typescript.mjs --test tests/*.test.mjs
           pnpm exec tsc --noEmit --incremental false
       - name: Build
         run: pnpm build
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

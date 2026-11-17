@@ -11,3 +11,6 @@ src/preview.ts
 custom.html
 preview.html
 scripts/build-custom.sh
+
+# 스트리머 그림 원본은 저장소에 올리지 않는다(암호화된 .png.enc만 올림, scripts/decrypt-personacons.mjs)
+assets/personacons/**/*.png

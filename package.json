@@ -14,9 +14,11 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
+    "personacons:encrypt": "node scripts/encrypt-personacons.mjs",
+    "personacons:decrypt": "node scripts/decrypt-personacons.mjs",
     "lint": "biome check --fix src/",
     "dev": "parcel index.html --port 1235",
-    "build": "node scripts/clean-dist.js && parcel build index.html --public-url ./ --no-cache && node scripts/fix-manifest-paths.mjs && node scripts/build-sw.js && node scripts/copy-legal.mjs",
+    "build": "node scripts/decrypt-personacons.mjs && node scripts/clean-dist.js && parcel build index.html --public-url ./ --no-cache && node scripts/fix-manifest-paths.mjs && node scripts/build-sw.js && node scripts/copy-legal.mjs",
     "preview": "parcel serve dist/index.html --port 4173"
   },
   "dependencies": {
