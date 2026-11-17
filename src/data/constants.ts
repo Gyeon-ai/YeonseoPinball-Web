@@ -5,7 +5,6 @@ export const canvasWidth = 1600;
 export const canvasHeight = 900;
 export const zoomThreshold = 5;
 export const STUCK_DELAY = 5000;
-export const winnerAreaHeight = 168;
 // 로즈 모브 패널의 밝은 테두리색을 경기장 네온과 미니맵에도 공통 적용한다.
 export const YEONSEO_HAIR = '#f0c9db';
 export const YEONSEO_PINK = '#f6ddeb';
@@ -20,18 +19,6 @@ export enum Skills {
   None,
   Impact,
 }
-
-export const DefaultEntityColor = {
-  box: YEONSEO_NEON_FILL,
-  circle: YEONSEO_HAIR,
-  polyline: YEONSEO_HAIR,
-} as const;
-
-export const DefaultBloomColor = {
-  box: YEONSEO_NEON,
-  circle: YEONSEO_NEON,
-  polyline: YEONSEO_NEON,
-};
 
 export const Themes: Record<string, ColorTheme> = {
   light: {

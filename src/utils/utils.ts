@@ -13,10 +13,6 @@ export function parseName(nameStr: string) {
   };
 }
 
-export function pad(v: number) {
-  return v.toString().padStart(2, '0');
-}
-
 export function shuffle<T>(originalArray: T[]): T[] {
   const array = originalArray.slice();
   let currentIndex = array.length;
