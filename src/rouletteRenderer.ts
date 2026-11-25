@@ -1,5 +1,18 @@
 import type { Camera } from './camera';
-import { canvasHeight, canvasWidth, initialZoom, Themes, UI_FONT_FAMILY } from './data/constants';
+import {
+  canvasHeight,
+  canvasWidth,
+  DOT_ACCENT,
+  DOT_FONT_FAMILY,
+  DOT_INK,
+  DOT_RED,
+  initialZoom,
+  NAME_FONT_FAMILY,
+  NUMBER_FONT_FAMILY,
+  Themes,
+  UI_FONT_FAMILY,
+  WINNER_NAME_FONT_FAMILY,
+} from './data/constants';
 import type { StageDef } from './data/maps';
 import type { GameObject } from './gameObject';
 import type { Marble } from './marble';
@@ -25,6 +38,8 @@ export type RenderParameters = {
 };
 
 const MAX_DISPLAY_WIDTH = 1920;
+// 타이머 상자와 당첨 상자 사이를 더 띄우는 거리(CSS px)
+const WINNER_PANEL_DROP = 16;
 const PERSONACON_URLS = [
   new URL('../assets/personacons/01-month.png', import.meta.url),
   new URL('../assets/personacons/03-month.png', import.meta.url),
@@ -101,6 +116,20 @@ export class RouletteRenderer {
     resizing();
   }
 
+  /**
+   * Request the web-font glyphs for these names ahead of time. The winner name and rank list fonts are
+   * served in pieces by character, so without this the winner name is first drawn in a fallback font
+   * and switches a moment later. Fire-and-forget; drawing never waits for it.
+   */
+  preloadNameFonts(names: string[]) {
+    if (typeof document === 'undefined' || !document.fonts) return;
+    const glyphs = Array.from(new Set(Array.from(names.join('')))).join('');
+    if (!glyphs) return;
+    for (const font of [`400 12px ${NAME_FONT_FAMILY}`, `700 12px ${NAME_FONT_FAMILY}`, `48px ${WINNER_NAME_FONT_FAMILY}`]) {
+      document.fonts.load(font, glyphs).catch(() => {});
+    }
+  }
+
   private async _loadImage(url: string): Promise<HTMLImageElement> {
     return new Promise((rs) => {
       const img = new Image();
@@ -112,6 +141,18 @@ export class RouletteRenderer {
   }
 
   private async _load(): Promise<void> {
+    // 캔버스에 쓰는 웹폰트를 미리 요청해 둔다. 기다리지는 않는다(늦게 오면 그때부터 그 글꼴로 그려진다).
+    if (typeof document !== 'undefined' && document.fonts) {
+      for (const font of [
+        `400 12px ${NAME_FONT_FAMILY}`,
+        `700 12px ${NAME_FONT_FAMILY}`,
+        `700 12px ${DOT_FONT_FAMILY}`,
+        `8px ${NUMBER_FONT_FAMILY}`,
+        `48px ${WINNER_NAME_FONT_FAMILY}`,
+      ]) {
+        document.fonts.load(font, '당첨 0123#').catch(() => {});
+      }
+    }
     this._personaconImages = await Promise.all(PERSONACON_URLS.map((url) => this._loadImage(url.toString())));
   }
 
@@ -264,17 +305,24 @@ export class RouletteRenderer {
     const cssScale = width / canvasRect.width;
     const settingsRect = document.getElementById('settings')?.getBoundingClientRect();
     const settingsTop = settingsRect?.height ? settingsRect.top : canvasRect.bottom - 150;
-    const roomBelowTimer = (settingsTop - timerRect.bottom - 30) / 156;
+    const roomBelowTimer = (settingsTop - timerRect.bottom - 30 - WINNER_PANEL_DROP) / 156;
     const winnerScale = Math.max(1, Math.min(2, canvasRect.width / 960, roomBelowTimer));
     const panelWidth = Math.min(timerRect.width * winnerScale * cssScale, width - 32 * cssScale);
     const panelX = (timerRect.left + timerRect.width / 2 - canvasRect.left) * cssScale - panelWidth / 2;
-    const panelY = (timerRect.bottom - canvasRect.top + 14) * cssScale;
+    const panelY = (timerRect.bottom - canvasRect.top + 14 + WINNER_PANEL_DROP) * cssScale;
     const panelHeight = Math.min(156 * winnerScale * cssScale, height - panelY - 16 * cssScale);
     if (panelHeight < 72 * cssScale) return;
 
     ctx.save();
     ctx.fillStyle = theme.winnerBackground;
     ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
+    // 모서리가 한 칸 비는 십자 모양 도트 테두리
+    const edge = Math.max(2, Math.round(3 * winnerScale * cssScale));
+    ctx.fillStyle = DOT_ACCENT;
+    ctx.fillRect(panelX, panelY - edge, panelWidth, edge);
+    ctx.fillRect(panelX, panelY + panelHeight, panelWidth, edge);
+    ctx.fillRect(panelX - edge, panelY, edge, panelHeight);
+    ctx.fillRect(panelX + panelWidth, panelY, edge, panelHeight);
 
     // Keep enlarged pixel art crisp; smooth only when shrinking a source image.
     const marbleImage = this.getMarbleImage(winner.name);
@@ -289,14 +337,13 @@ export class RouletteRenderer {
     const panelCenterX = panelX + panelWidth / 2;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.strokeStyle = theme.winnerOutline;
-    ctx.lineWidth = 3 * winnerScale * cssScale;
-    ctx.font = `700 ${Math.min(42 * winnerScale * cssScale, panelHeight * .28)}px ${UI_FONT_FAMILY}`;
-    ctx.fillStyle = theme.winnerText;
-    if (theme.winnerOutline) {
-      ctx.strokeText('당첨', panelCenterX, panelY + panelHeight * .28);
-    }
-    ctx.fillText('당첨', panelCenterX, panelY + panelHeight * .28);
+    ctx.font = `700 ${Math.min(36 * winnerScale * cssScale, panelHeight * .24)}px ${DOT_FONT_FAMILY}`;
+    const labelShadow = Math.max(1, Math.round(3 * winnerScale * cssScale));
+    const labelY = panelY + panelHeight * .28;
+    ctx.fillStyle = DOT_RED;
+    ctx.fillText('당 첨', panelCenterX + labelShadow, labelY + labelShadow);
+    ctx.fillStyle = DOT_ACCENT;
+    ctx.fillText('당 첨', panelCenterX, labelY);
 
     const characters = Array.from(winner.name);
     const maxNameSize = Math.min(58 * winnerScale * cssScale, panelHeight * .37);
@@ -308,7 +355,7 @@ export class RouletteRenderer {
         characters.slice(Math.floor(index * characters.length / lineCount), Math.floor((index + 1) * characters.length / lineCount)).join('')
       );
       let candidateSize = Math.min(maxNameSize, nameBlockHeight / (lineCount * 1.08));
-      ctx.font = `700 ${candidateSize}px ${UI_FONT_FAMILY}`;
+      ctx.font = `${candidateSize}px ${WINNER_NAME_FONT_FAMILY}`;
       const widestLine = Math.max(...lines.map((line) => ctx.measureText(line).width));
       candidateSize *= Math.min(1, textWidth / Math.max(1, widestLine));
       if (candidateSize > nameSize) {
@@ -316,7 +363,7 @@ export class RouletteRenderer {
         nameSize = candidateSize;
       }
     }
-    ctx.font = `700 ${nameSize}px ${UI_FONT_FAMILY}`;
+    ctx.font = `${nameSize}px ${WINNER_NAME_FONT_FAMILY}`;
     // [이름 + 간격 + 공]을 한 묶음으로 보고 상자 가운데에 둔다(줄인 글자 크기로 잰 실제 이름 폭 기준)
     const nameWidth = Math.min(textWidth, Math.max(...nameLines.map((line) => ctx.measureText(line).width)));
     const groupWidth = nameWidth + nameGap + marbleSize;
@@ -341,13 +388,14 @@ export class RouletteRenderer {
       ctx.fill();
     }
 
-    ctx.fillStyle = `hsl(${winner.hue} 100% ${theme.marbleLightness})`;
+    const nameColor = `hsl(${winner.hue} 100% ${theme.marbleLightness}%)`;
+    const nameShadow = Math.max(1, Math.round(nameSize / 20));
     const lineHeight = nameSize * 1.08;
     nameLines.forEach((line, index) => {
       const lineY = nameCenterY + (index - (nameLines.length - 1) / 2) * lineHeight;
-      if (theme.winnerOutline) {
-        ctx.strokeText(line, textCenterX, lineY);
-      }
+      ctx.fillStyle = DOT_INK;
+      ctx.fillText(line, textCenterX + nameShadow, lineY + nameShadow);
+      ctx.fillStyle = nameColor;
       ctx.fillText(line, textCenterX, lineY);
     });
     ctx.restore();

@@ -20,6 +20,9 @@
   <meta property="og:site_name" content="연서 핀볼">
   <meta property="og:type" content="website">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&amp;family=Press+Start+2P&amp;family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap">
   <link rel='stylesheet' href='assets/style.scss' />
 </head>
 <body>
@@ -144,7 +147,9 @@
       countdownRemainingMs = Math.max(0, countdownEndAt - Date.now());
     }
 
-    document.querySelector('#resultTimerDisplay').textContent = formatCountdown(countdownRemainingMs / 1000);
+    const display = document.querySelector('#resultTimerDisplay');
+    display.textContent = formatCountdown(countdownRemainingMs / 1000);
+    display.classList.toggle('long', display.textContent.length > 5);
     if (countdownRemainingMs === 0) {
       clearCountdownInterval();
       updateCountdownPauseButton();
@@ -323,6 +328,73 @@
       const index = e.target.value;
       window.roulette.setMap(index);
     });
+
+    setupDotSelect(mapSelector);
+
+    // 맵 선택의 펼쳐지는 목록을 브라우저 기본 대신 도트 모양으로 보여 준다.
+    // 고르면 원래 선택 상자의 값을 바꾸고 change를 알리므로 맵을 바꾸는 동작은 그대로다.
+    function setupDotSelect(select) {
+      const row = select.parentElement;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'dot-select';
+      button.setAttribute('aria-haspopup', 'listbox');
+      button.setAttribute('aria-label', select.getAttribute('aria-label') || '');
+      const list = document.createElement('ul');
+      list.className = 'dot-select-list';
+      list.setAttribute('role', 'listbox');
+      list.hidden = true;
+      row.classList.add('dot-select-row');
+      select.classList.add('dot-select-native');
+      row.append(button, list);
+
+      const close = () => {
+        list.hidden = true;
+        button.setAttribute('aria-expanded', 'false');
+      };
+      const sync = () => {
+        const options = Array.from(select.options);
+        const current = options[select.selectedIndex];
+        button.textContent = current ? current.textContent : '';
+        list.textContent = '';
+        options.forEach((option) => {
+          const item = document.createElement('li');
+          item.setAttribute('role', 'option');
+          item.tabIndex = -1;
+          item.textContent = option.textContent;
+          if (option === current) {
+            item.className = 'on';
+            item.setAttribute('aria-selected', 'true');
+          }
+          item.addEventListener('click', () => {
+            close();
+            if (select.value === option.value) return;
+            select.value = option.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+          list.append(item);
+        });
+      };
+      button.addEventListener('click', () => {
+        list.hidden = !list.hidden;
+        button.setAttribute('aria-expanded', String(!list.hidden));
+        const first = list.querySelector('.on') || list.firstElementChild;
+        if (!list.hidden && first) first.focus();
+      });
+      list.addEventListener('keydown', (e) => {
+        const items = Array.from(list.children);
+        const at = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown' && at < items.length - 1) { e.preventDefault(); items[at + 1].focus(); }
+        if (e.key === 'ArrowUp' && at > 0) { e.preventDefault(); items[at - 1].focus(); }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.activeElement.click(); button.focus(); }
+        if (e.key === 'Escape') { close(); button.focus(); }
+      });
+      document.addEventListener('mousedown', (e) => {
+        if (!row.contains(e.target)) close();
+      });
+      select.addEventListener('change', sync);
+      sync();
+    }
 
     function simpleToast(msg) {
       const toast = document.createElement('div');

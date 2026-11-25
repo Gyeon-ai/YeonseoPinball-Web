@@ -1,16 +1,37 @@
-// 유연서 SD 캐릭터의 분홍 리본과 은보라 머리색을 섞은 밝은 로즈 모브 UI다.
+// 오락실 도트 테마: 각진 도트 테두리, 굵은 단추, 도트 숫자(운영 타요·결희·마이곰이와 같은 모양). 색은 2026-11-26 연서 두 번째 사진에서 정한 판(연보라 머리·주황빛 붉은 눈·검은 바탕). 시안 `시안\연서-오락실도트-작동\dot.css`.
+@font-face {
+  font-family: 'Galmuri11';
+  src: url(https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/Galmuri11.woff2) format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Galmuri11';
+  src: url(https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/Galmuri11-Bold.woff2) format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  --ui-font: 'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
-  --hair-primary: #f0c9db;
-  --hair-deep: #5b3d50;
-  --hair-border: #f0c9db;
-  --hair-soft: #f6ddeb;
-  --hair-cream: #fff3f8;
-  --hair-ink: #553443;
-  --hair-button: rgba(197, 142, 173, .94);
-  --hair-panel-gradient: linear-gradient(180deg, rgba(164, 116, 151, .72) 0%, rgba(148, 100, 132, .70) 100%);
-  --hair-settings-gradient: linear-gradient(180deg, rgba(164, 116, 151, .70) 0%, rgba(148, 100, 132, .68) 100%);
-  --hair-border-gradient: linear-gradient(180deg, rgba(240, 201, 219, .98) 0%, rgba(240, 201, 219, .98) 100%);
+  --ui-font: 'Noto Sans KR', 'Pretendard Variable', Pretendard, 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
+  --dot-font: 'Galmuri11', 'Noto Sans KR', sans-serif;
+  --number-font: 'Press Start 2P', 'Galmuri11', monospace;
+  --dot-bg: #241a33;
+  --dot-band: #8a6aa8;
+  --dot-box: #33264a;
+  --dot-line: #c4a8e0;
+  --dot-line-soft: #ecdff7;
+  --dot-ink: #120c1a;
+  --dot-text: #fbf6ff;
+  --dot-accent: #ffb38a;
+  --dot-red: #e0502e;
+  --dot-red-deep: #6b2010;
+  --dot-blue: #4f3d6e;
+  --dot-cyan: #d9c4f0;
+  // 십자 모양 그림자로 만드는 도트 테두리(모서리가 한 칸 빈다)
+  --dot-border: 0 -4px 0 var(--dot-line), 0 4px 0 var(--dot-line), -4px 0 0 var(--dot-line), 4px 0 0 var(--dot-line);
+  color-scheme: dark;
 }
 
 * {
@@ -29,10 +50,6 @@ textarea {
 body {
   font-weight: 400;
   font-synthesis: none;
-  margin: 0;
-  min-height: 100vh;
-  overflow: hidden;
-  background: #000;
 }
 
 .sr-only {
@@ -64,8 +81,9 @@ canvas {
   mask-position: center center;
   mask-size: contain;
   display: inline-block;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
+  flex: none;
   vertical-align: middle;
 
   &.play {
@@ -82,6 +100,7 @@ canvas {
 
 }
 
+// 이름표(왼쪽 위): 자리와 크기는 이전과 같고 모양만 도트
 .brand-mark {
   position: fixed;
   top: 18px;
@@ -89,51 +108,51 @@ canvas {
   z-index: 998;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
-  padding: 7px 18px 7px 7px;
-  border: 2px solid transparent;
-  border-radius: 22px;
-  background: linear-gradient(145deg, rgba(255, 243, 248, .96), rgba(240, 201, 219, .86)) padding-box,
-              var(--hair-border-gradient) border-box;
-  box-shadow: 0 14px 34px rgba(67, 39, 55, .42), 0 0 26px rgba(240, 201, 219, .24);
+  padding: 8px 18px 8px 8px;
+  border: 0;
+  border-radius: 0;
+  background: var(--dot-band);
+  box-shadow: 0 -4px 0 var(--dot-ink), 0 4px 0 var(--dot-ink), -4px 0 0 var(--dot-ink), 4px 0 0 var(--dot-ink), 0 12px 0 rgba(0, 0, 0, .35);
   pointer-events: none;
-  backdrop-filter: blur(14px);
 
   img {
-    width: 76px;
-    height: 76px;
+    width: 72px;
+    height: 72px;
     display: block;
     object-fit: contain;
     image-rendering: auto;
-    filter: drop-shadow(0 5px 8px rgba(197, 142, 173, .24));
+    background: var(--dot-cyan);
+    box-shadow: 0 4px 0 var(--dot-ink);
   }
 
   strong {
-    color: var(--hair-deep);
-    font-size: 26px;
-    font-weight: 850;
+    color: var(--dot-accent);
+    font-family: var(--dot-font);
+    font-size: 24px;
+    font-weight: 700;
     line-height: 1;
-    letter-spacing: -.035em;
     white-space: nowrap;
+    text-shadow: 3px 3px 0 var(--dot-ink);
   }
 }
 
 
 #settings {
   position: fixed;
-  bottom: 1rem;
-  left: 1rem;
-  background: var(--hair-settings-gradient);
-  border: 2px solid var(--hair-border);
-  border-radius: 12px;
-  padding: 10px;
-  color: var(--hair-cream);
-  box-shadow: 0 10px 32px rgba(67, 39, 55, .52), 0 0 22px rgba(240, 201, 219, .46), inset 0 1px 0 rgba(255, 255, 255, .2);
+  bottom: 16px;
+  left: 20px;
+  background: var(--dot-box);
+  border: 0;
+  border-radius: 0;
+  padding: 8px;
+  color: var(--dot-text);
+  box-shadow: var(--dot-border), 0 8px 0 var(--dot-ink);
   z-index: 999;
   width: clamp(640px, 44vw, 760px);
   min-width: 640px;
-  gap: 10px;
+  gap: 8px;
 
   display: flex;
   visibility: visible;
@@ -143,10 +162,9 @@ canvas {
   &.game-running {
     min-width: 0;
     width: auto;
-    // 캔버스 확대율을 반영한 미니맵의 실제 오른쪽 끝에서 12px 떨어뜨린다.
-    left: max(16px, min(240px, calc(17.8125vw + 12px), calc(100vw - 298px)));
+    // 캔버스 확대율을 반영한 미니맵의 실제 오른쪽 끝(도트 테두리 포함)에서 12px 떨어뜨린다.
+    left: max(20px, min(244px, calc(17.8125vw + 16px), calc(100vw - 302px)));
     padding: 0;
-    border: 0;
     background: transparent;
     box-shadow: none;
 
@@ -167,52 +185,53 @@ canvas {
     div.right div.speed-row {
       display: flex;
       height: auto;
-      padding: 10px;
-      border: 2px solid var(--hair-border);
-      border-radius: 12px;
-      background: var(--hair-settings-gradient);
-      box-shadow: 0 8px 24px rgba(67, 39, 55, .48), 0 0 20px rgba(240, 201, 219, .42);
+      padding: 8px;
+      background: var(--dot-box);
+      box-shadow: var(--dot-border), 0 8px 0 var(--dot-ink);
+    }
+  }
 
-      .speed-group {
-        width: 258px;
-      }
+  ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(127, 127, 127, .22);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--dot-line-soft);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 0;
+  }
+
+  button {
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.12);
     }
   }
 
   textarea {
     width: 100%;
     height: 100%;
-    min-height: 6.5rem;
-    border: 1px solid var(--hair-soft);
-    border-radius: 7px;
-    background: rgba(255, 243, 248, .96);
-    color: var(--hair-ink);
-    font-size: 14pt;
+    min-height: 128px;
+    resize: none;
+    border: 4px solid var(--dot-line-soft);
+    border-radius: 0;
+    background: var(--dot-bg);
+    color: var(--dot-text);
+    font-size: 18px;
     font-weight: 500;
     line-height: 1.45;
-    padding: 6px 8px;
-  }
+    padding: 8px 12px;
 
-  button {
-    color: var(--hair-cream);
-    background: var(--hair-button);
-    border: 1px solid rgba(240, 201, 219, .86);
-    border-radius: 7px;
-    padding: 5px 10px;
-    font-weight: 600;
-    position: relative;
-    display: inline-block;
-
-    &:active:after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
+    &::placeholder {
+      color: var(--dot-line-soft);
     }
-
   }
 
   div.left {
@@ -227,18 +246,18 @@ canvas {
     order: 2;
     flex-grow: 0;
     flex-shrink: 0;
-    width: 290px;
+    width: 300px;
 
     .collapsible-rows {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     div.row {
       display: flex;
       align-items: center;
-      height: 35px;
+      height: 36px;
 
     }
 
@@ -250,131 +269,205 @@ canvas {
     div.speed-row {
       display: none;
     }
+
+    div.row > .speed-group {
+      flex: none;
+      width: 258px;
+    }
   }
 
   .setup-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    height: 34px;
+    gap: 8px;
+    height: 44px;
 
     button {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 8px;
       min-width: 0;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      color: var(--dot-text);
+      font-family: var(--dot-font);
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1;
+
+      // 누르면 그림자만큼 내려간다
+      &:active {
+        transform: translateY(4px);
+        box-shadow: none;
+      }
+    }
+
+    #btnShuffle {
+      background: var(--dot-blue);
+      box-shadow: 0 4px 0 var(--dot-ink);
+    }
+
+    #btnStart {
+      background: var(--dot-red);
+      box-shadow: 0 4px 0 var(--dot-red-deep);
     }
   }
 
-  select {
-    height: 25px;
+  select,
+  .dot-select {
+    appearance: none;
+    height: 36px;
     width: 100%;
-    border: 1px solid var(--hair-soft);
-    border-radius: 6px;
-    background: rgba(255, 243, 248, .96);
-    color: var(--hair-ink);
-    font-weight: 500;
+    padding: 0 40px 0 12px;
+    border: 2px solid var(--dot-line-soft);
+    border-radius: 0;
+    // 계단 모양 화살표
+    background: var(--dot-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M0 0h16v2H0zM2 2h12v2H2zM4 4h8v2H4zM6 6h4v2H6z' fill='%23f4f4f4'/%3E%3C/svg%3E") right 12px center no-repeat;
+    color: var(--dot-text);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
   }
 
-  input[type=checkbox] {
-    width: 50px;
-    display: inline-block;
-    padding-right: 63px;
-    height: 25px;
+  select option {
+    background: var(--dot-bg);
+    color: var(--dot-text);
+  }
+
+  // 맵 선택: 브라우저 기본 목록 대신 쓰는 도트 목록(index.html의 스크립트가 만든다). 패널이 화면 아래에 있어 위로 펼친다.
+  div.right div.row.dot-select-row {
     position: relative;
-    vertical-align: middle;
+  }
 
-    &:before {
-      position: absolute;
-      content: '';
-      display: inline-block;
-      width: 50px;
-      height: 25px;
-      border-radius: 25px;
-      background: rgba(197, 142, 173, .76);
-      top: 0;
-      left: 0;
+  select.dot-select-native {
+    display: none;
+  }
+
+  .dot-select {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dot-select-list {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 44px;
+    z-index: 5;
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    background: var(--dot-bg);
+    color: var(--dot-text);
+    box-shadow: 0 -4px 0 var(--dot-line-soft), 0 4px 0 var(--dot-line-soft), -4px 0 0 var(--dot-line-soft), 4px 0 0 var(--dot-line-soft), 0 12px 0 rgba(13, 14, 23, .6);
+
+    &[hidden] {
+      display: none;
     }
 
-    &:after {
-      position: absolute;
-      top: 0;
-      left: 0;
-      content: '';
-      border-radius: 25px;
-      width: 25px;
-      height: 25px;
-      background: var(--hair-soft);
-      transition: transform .2s;
-    }
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      padding: 0 10px;
+      white-space: nowrap;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
 
-    &:checked:after {
-      transform: translateX(100%);
-      background: var(--hair-cream);
-    }
+      &::before {
+        content: '';
+        flex: none;
+        width: 10px;
+        height: 10px;
+        background: transparent;
+      }
 
-    &:checked:before {
-      content: '';
-      background: var(--hair-primary);
+      &:hover,
+      &:focus {
+        background: var(--dot-band);
+      }
+
+      &.on {
+        background: var(--dot-accent);
+        color: var(--dot-bg);
+
+        &::before {
+          background: var(--dot-bg);
+        }
+      }
     }
   }
 
+  // 묶음 단추(당첨 순위, 배속): 고른 칸은 노랑
   .btn-group {
     display: flex;
     justify-content: stretch;
 
     & > * {
       box-sizing: border-box;
-      flex-grow: 0;
-      flex-shrink: 0;
+      flex: 1 1 0;
+      min-width: 0;
       overflow: hidden;
-      height: 25px;
-      width: 33%;
+      height: 36px;
+      margin: 0;
       border-radius: 0;
-      background: rgba(197, 142, 173, .84);
-      border: 1px solid rgba(240, 201, 219, .7);
+      background: var(--dot-band);
+      border: 2px solid var(--dot-line);
       padding: 0;
-      color: var(--hair-cream);
-      font-weight: 600;
+      color: var(--dot-text);
+      font-size: 16px;
+      font-weight: 700;
 
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 6px;
 
-      &:first-child {
-        border-radius: 10px 0 0 10px;
-      }
-
-      &:last-child {
-        border-radius: 0 10px 10px 0;
+      & + * {
+        margin-left: -2px;
       }
 
       &.active:before {
         content: '';
-        width: 15px;
-        height: 15px;
-        display: inline-block;
-        vertical-align: middle;
-        mask-image: url('images/check.svg');
-        mask-repeat: no-repeat;
-        background: var(--hair-ink);
+        flex: none;
+        width: 14px;
+        height: 14px;
+        mask: url('images/check.svg') center / contain no-repeat;
+        background: var(--dot-bg);
       }
 
       &.active {
-        background: var(--hair-cream);
-        color: var(--hair-ink);
+        position: relative;
+        background: var(--dot-accent);
+        // 고른 칸도 다른 칸과 같은 테두리를 둘러 칸 줄이 끊겨 보이지 않게 한다
+        border-color: var(--dot-line);
+        color: var(--dot-bg);
       }
     }
 
     input[type=number] {
       box-sizing: border-box;
       text-align: center;
-    }
-  }
+      font-family: var(--number-font);
+      font-size: 16px;
 
-  .speed-group {
-    width: 258px;
+      &.active:before {
+        content: none;
+      }
+    }
+
+    .btn-speed {
+      font-family: var(--number-font);
+      font-weight: 400;
+    }
   }
 }
 
@@ -389,14 +482,22 @@ canvas {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--hair-border);
-  border-radius: 12px;
-  background: var(--hair-panel-gradient);
-  box-shadow: 0 0 22px rgba(240, 201, 219, .56), inset 0 1px 0 rgba(255, 255, 255, .2);
-  color: var(--hair-cream);
+  border: 0;
+  border-radius: 0;
+  background: var(--dot-ink);
+  box-shadow: 0 -4px 0 var(--dot-accent), 0 4px 0 var(--dot-accent), -4px 0 0 var(--dot-accent), 4px 0 0 var(--dot-accent);
+  color: var(--dot-text);
 
   &.hidden {
     display: none;
+  }
+
+  button {
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(1.12);
+    }
   }
 
   .result-timer-setup,
@@ -410,11 +511,14 @@ canvas {
 
   .result-timer-setup {
     display: flex;
-    gap: 18px;
+    gap: 20px;
 
     strong {
-      font-size: 20px;
+      font-family: var(--dot-font);
+      font-size: 24px;
       font-weight: 700;
+      line-height: 1;
+      color: var(--dot-accent);
     }
   }
 
@@ -422,51 +526,68 @@ canvas {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 7px;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 700;
 
     input[type=number] {
       width: 76px;
-      height: 38px;
-      border: 1px solid var(--hair-soft);
-      border-radius: 6px;
-      background: var(--hair-cream);
-      color: var(--hair-ink);
+      height: 40px;
+      border: 2px solid var(--dot-line-soft);
+      border-radius: 0;
+      background: var(--dot-bg);
+      color: var(--dot-text);
       text-align: center;
-      font-size: 18px;
-      font-weight: 600;
+      font-family: var(--number-font);
+      font-size: 16px;
+      font-weight: 400;
     }
 
     button {
-      height: 38px;
-      margin-left: 8px;
+      height: 40px;
+      margin: 0 0 4px 8px;
       padding: 0 20px;
-      border: 1px solid var(--hair-soft);
-      border-radius: 6px;
-      background: var(--hair-button);
-      color: var(--hair-cream);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
+      border: 0;
+      border-radius: 0;
+      background: var(--dot-red);
+      box-shadow: 0 4px 0 var(--dot-red-deep);
+      color: var(--dot-text);
+      font-family: var(--dot-font);
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1;
+
+      &:active {
+        transform: translateY(4px);
+        box-shadow: none;
+      }
     }
   }
 
   .result-timer-running {
     display: none;
-    gap: 4px;
+    gap: 6px;
 
     span {
-      color: var(--hair-cream);
+      color: var(--dot-accent);
       font-size: 18px;
-      font-weight: 600;
+      font-weight: 700;
+      line-height: 1.2;
     }
 
     strong {
-      font-family: var(--ui-font);
-      font-size: 72px;
+      font-family: var(--number-font);
+      font-size: 64px;
       font-variant-numeric: tabular-nums;
-      font-weight: 700;
-      letter-spacing: .04em;
+      font-weight: 400;
       line-height: 1;
+      color: var(--dot-accent);
+      text-shadow: 4px 4px 0 var(--dot-red);
+
+      // 1시간 이상(00:00:00)은 상자 안에 들어오도록 한 단계 줄인다
+      &.long {
+        font-size: 48px;
+      }
     }
   }
 
@@ -475,22 +596,29 @@ canvas {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 4px;
+    margin-top: 2px;
 
     button {
       min-width: 88px;
-      height: 30px;
+      height: 28px;
+      margin-bottom: 3px;
       padding: 0 14px;
-      border: 1px solid var(--hair-soft);
-      border-radius: 6px;
-      background: var(--hair-button);
-      color: var(--hair-cream);
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
+      border: 0;
+      border-radius: 0;
+      background: var(--dot-blue);
+      box-shadow: 0 3px 0 var(--dot-bg);
+      color: var(--dot-text);
+      font-family: var(--dot-font);
+      font-size: 12px;
+      font-weight: 700;
 
       &:last-child {
-        background: rgba(178, 121, 153, .92);
+        background: var(--dot-box);
+      }
+
+      &:active {
+        transform: translateY(3px);
+        box-shadow: none;
       }
 
       &:disabled {
@@ -515,22 +643,6 @@ canvas {
   .brand-mark {
     top: 10px;
     left: 10px;
-    min-width: 0;
-    padding: 6px 12px 6px 6px;
-    border-radius: 18px;
-
-    img {
-      width: 52px;
-      height: 52px;
-    }
-
-    strong {
-      font-size: 18px;
-    }
-
-    small {
-      font-size: 12px;
-    }
   }
 
   #settings {
@@ -538,8 +650,7 @@ canvas {
     display: block;
     min-width: 0;
     max-width: 100%;
-    width: calc(100% - 2rem);
-    overflow: hidden;
+    width: calc(100% - 40px);
     opacity: 1;
     visibility: visible;
     transition: visibility 0s, opacity 1s linear;
@@ -548,40 +659,39 @@ canvas {
       width: 100%;
     }
 
-    textarea {
-      min-height: 3.75rem;
-      font-size: 11pt;
+    .collapsible-rows {
+      margin-bottom: 8px;
     }
 
-    div.right div.row {
-      height: auto;
-      display: block;
-      border-bottom: 1px solid rgba(240, 201, 219, .44);
-      padding: .5rem 0;
-
-      .icon {
-        width: 15px;
-        height: 15px;
-      }
+    textarea {
+      min-height: 60px;
+      font-size: 16px;
     }
   }
-}
 
-@media screen and (max-width: 750px) {
   .result-timer-overlay {
     top: 70px;
     left: 50%;
+
+    .result-timer-running strong {
+      font-size: 48px;
+    }
   }
 }
 
 div.toast {
   position: fixed;
   transform: translate(-50%, 0);
-  padding: 8px;
-  border-radius: 4px;
-  background: #ccc;
+  padding: 12px 20px;
+  border-radius: 0;
+  background: var(--dot-ink);
+  color: var(--dot-text);
+  font-family: var(--dot-font);
+  font-size: 24px;
+  line-height: 1;
+  box-shadow: 0 -4px 0 var(--dot-cyan), 0 4px 0 var(--dot-cyan), -4px 0 0 var(--dot-cyan), 4px 0 0 var(--dot-cyan);
   overflow: hidden;
-  bottom: 10px;
+  bottom: 14px;
   left: 50%;
   z-index: 1000;
   animation: .2s linear fade-in, .2s linear 1s reverse fade-in;

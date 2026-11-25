@@ -1,4 +1,4 @@
-import { initialZoom, YEONSEO_BORDER_COLORS } from './data/constants';
+import { DOT_LINE, initialZoom, YEONSEO_BORDER_COLORS } from './data/constants';
 import type { RenderParameters } from './rouletteRenderer';
 import type { ColorTheme } from './types/ColorTheme';
 import type { MapEntityState } from './types/MapEntity.type';
@@ -88,15 +88,16 @@ export class Minimap implements UIObject {
 
     ctx.restore();
     ctx.save();
-    ctx.strokeStyle = this.createHairGradient(
-      ctx,
-      this.boundingBox.x,
-      this.boundingBox.y,
-      this.boundingBox.x + this.boundingBox.w,
-      this.boundingBox.y + this.boundingBox.h
-    );
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(this.boundingBox.x, this.boundingBox.y, this.boundingBox.w, this.boundingBox.h);
+    // 모서리가 한 칸 비는 십자 모양 도트 테두리
+    const { x, y, w, h } = this.boundingBox;
+    ctx.strokeStyle = DOT_LINE;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+    ctx.fillStyle = DOT_LINE;
+    ctx.fillRect(x, y - 2, w, 2);
+    ctx.fillRect(x, y + h, w, 2);
+    ctx.fillRect(x - 2, y, 2, h);
+    ctx.fillRect(x + w, y, 2, h);
     ctx.restore();
   }
 
