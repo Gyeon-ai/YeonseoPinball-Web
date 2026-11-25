@@ -15,11 +15,11 @@ export const YEONSEO_NEON_HIGHLIGHT = YEONSEO_NEON;
 export const YEONSEO_BORDER_COLORS = [YEONSEO_HAIR, YEONSEO_HAIR] as const;
 export const UI_FONT_FAMILY = `'Pretendard Variable', Pretendard, 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif`;
 // 오락실 도트 테마의 캔버스용 색과 글꼴(패널 쪽 값은 assets/style.scss의 :root)
-export const DOT_LINE = '#c4a8e0';
-export const DOT_INK = '#120c1a';
-export const DOT_TEXT_SOFT = '#ecdff7';
-export const DOT_ACCENT = '#ffb38a';
-export const DOT_RED = '#e0502e';
+export const DOT_LINE = '#d9bfee';
+export const DOT_INK = '#2a1c3a';
+export const DOT_TEXT_SOFT = '#f3d6f4';
+export const DOT_ACCENT = '#f4a9c4';
+export const DOT_RED = '#e2574c';
 export const NAME_FONT_FAMILY = `'Noto Sans KR', sans-serif`;
 export const DOT_FONT_FAMILY = `'Galmuri11', 'Noto Sans KR', sans-serif`;
 export const NUMBER_FONT_FAMILY = `'Press Start 2P', 'Galmuri11', monospace`;
@@ -94,7 +94,7 @@ export const Themes: Record<string, ColorTheme> = {
     rankStroke: '',
     minimapBackground: '#000000',
     minimapViewport: YEONSEO_BORDER,
-    winnerBackground: 'rgba(18, 12, 26, 0.9)',
+    winnerBackground: 'rgba(42, 28, 58, 0.9)',
     winnerOutline: '',
     winnerText: 'white',
   },
