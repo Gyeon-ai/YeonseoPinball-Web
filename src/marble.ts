@@ -201,9 +201,7 @@ export class Marble {
       this._drawOutline(ctx, 2 / zoom, x, y);
     }
 
-    if (options.useSkills) {
-      this._renderCoolTime(ctx, zoom, x, y);
-    }
+    // 2026-11-25 사용자 "빨간 원호 다 없애줄래?"(릴파와 같음): 쿨타임 원호는 그리지 않는다. 스킬·충격파는 그대로.
   }
 
   private _drawName(ctx: CanvasRenderingContext2D, zoom: number, x: number, y: number) {
