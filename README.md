@@ -20,18 +20,6 @@
 
 후보 수에는 고정 제한을 두지 않지만, 생성되는 공이 많을수록 기기 성능과 선택한 배속에 따라 프레임이 낮아질 수 있다.
 
-## 실행과 빌드
-
-Node.js 20 이상과 pnpm이 필요하다.
-
-```powershell
-pnpm install
-pnpm dev
-pnpm build
-```
-
-개발 주소는 `http://localhost:1235`이며, 정적 배포 파일은 `dist` 폴더에 생성된다. 빌드할 때 `LICENSE`와 `NOTICE.md`도 배포 결과에 함께 복사된다.
-
 ## 수집기 연결
 
 Windows 수집기의 `PinballUrl`에 배포 주소를 넣으면 기존 `?names=` 명단 전달 기능을 사용할 수 있다.
